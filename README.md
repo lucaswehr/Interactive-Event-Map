@@ -16,4 +16,6 @@ Simplicity is what I'm focusing on, and this project has three simple instructio
 
 3.) Filter said events based on how you're feeling
 
+4.) Filter Age Restrictions
+
 Again this is a work and progess, and I still plan more user friendly features such as filtering out 21+, 18+, or child-friendly events making it more easier to use.
