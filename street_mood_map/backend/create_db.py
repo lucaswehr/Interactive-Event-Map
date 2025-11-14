@@ -34,6 +34,7 @@ class Event(Base): # creates individual columns for each row
     description = Column(String, nullable=True)
     genre = Column(String)
     url = Column(String)
+    ageRestriction = Column(String)
     
 
 

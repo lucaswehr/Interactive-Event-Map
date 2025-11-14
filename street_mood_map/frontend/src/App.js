@@ -152,12 +152,12 @@ return (
         marginTop: "5px",
         borderTop: "1px solid #ccc",
         paddingTop: "5px",
-      
        }}
        > 
         <p><strong>Genre: </strong>{event.genre}</p>
         <p><strong>Description:</strong> {event.description} </p>
         <p><strong>Vibe: </strong>{event.predicted_vibe}</p>
+        <p><strong>Age Restrictions: </strong>{event.ageRestriction}</p>
 
   </div>
       </Popup>
@@ -189,6 +189,7 @@ const Recenter = ({ center }) => {
 function App() 
 {
 
+  const [age, setAge] = useState("All ages")
   const [genre, setGenre] = useState("all");
   const[size, setSize] = useState("10");
  const [center, setCenter] = useState(() => { // this useState remembers the current center even if the page is refreshed
@@ -312,6 +313,23 @@ function App()
           </label>
         </form>
 
+        {/* Filter Age Button */}
+         <form style={{zIndex: "1000", position: "absolute", marginLeft: "224px", marginTop: "220px"}}>
+          <label>
+            Filter Age:{" "}
+            <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {age} onChange={e => {const newAge = e.target.value; setAge(newAge)}}>
+                <option value = "All ages">All Ages</option>
+                <option value = "18+">18+</option>
+                <option value = "21+">21+</option>
+            </select>
+          </label>
+        </form>
+
+         {/*White background bar behind the filter age button*/}
+        <div style ={{width: "159px", height: "25px", zIndex: "900", position:"absolute", backgroundColor: "white", 
+            border: "3px solid black", borderRadius: "30px", marginLeft: "215px", marginTop: "217px" ,boxShadow: "2px 8px 10px black"}}>
+        </div>
+
          {/*White background bar behind the filter button*/}
         <div style ={{width: "185px", height: "25px", zIndex: "900", position:"absolute", backgroundColor: "white", 
             border: "3px solid black", borderRadius: "30px", marginLeft: "215px", marginTop: "167px" ,boxShadow: "2px 8px 10px black"}}>
@@ -349,9 +367,16 @@ function App()
       {filteredEvents
           .filter(event =>  { // filters all the events the user selects, if "all", it returns all events
 
-            if (genre.toLowerCase() === "all") return true; 
+            // Filter by genre first
+            const genreMatch = genre.toLowerCase() === "all" || event.predicted_vibe.toLowerCase() === genre.toLowerCase();
 
-            return event.predicted_vibe.toLowerCase() === genre.toLowerCase();
+            // Normalize age values
+            const eventAge = event.ageRestriction ? event.ageRestriction.trim() : "All ages";
+            const selectedAge = age ? age.trim() : "All ages";
+
+            const ageMatch = selectedAge === "All ages" || eventAge === selectedAge;
+
+            return genreMatch && ageMatch;
           })
           .map(event => ( // loops through all my events in the useState
         <EventMarker key={event.id} event={event}/>

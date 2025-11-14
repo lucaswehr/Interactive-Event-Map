@@ -23,6 +23,7 @@ import redis # --> allows me to use cache my data (If this project was ever to s
 # ask for something like "I want 50 events in seattle" many times, the cached data (which is seattle and 50 events for this example)
 # will retrive it instantly, completely skipping the querying and database entirely.)
 import json
+import re
 
 cache = redis.Redis(host='localhost', port=6379, db=0) # --> connects to redis for caching
 
@@ -66,7 +67,8 @@ def get_events():
         "predicted_noise": e.predicted_noise,
         "description": e.description,
         "genre": e.genre,
-        "url": e.url
+        "url": e.url,
+        "ageRestriction": e.ageRestriction
 
     } for e in events])
 #-------------------------------CONVERTS DATA TO JSON END----------------------------------#
@@ -161,7 +163,8 @@ def fetch_events():
             "predicted_noise": e.predicted_noise,
             "description": e.description,
             "genre": e.genre,
-            "url": e.url
+            "url": e.url,
+            "ageRestriction": e.ageRestriction
         } for e in existing_events]
 
         # Cache the result
@@ -217,6 +220,25 @@ def fetch_events():
          vibe = getVibe(genre) # --> gives me the vibe of the event
          url = ev.get("url", "")
 
+         age = ev.get("ageRestrictions", {})
+
+         if age.get("minimumAge"):
+            age_Restriction = f"{age["minimumAge"]}+"
+         elif age.get("legalAgeEnforced"):
+            age_Restriction = "Age Restricted"
+         else:
+            age_Restriction = "All Ages"
+
+         match = re.search(r"\b(1[89]|2[01])\b", description)
+         min_age = age.get("minimumAge")
+     
+         if match:
+            age_Restriction = f"{match.group(0)}+"
+         elif min_age:
+            age_Restriction = f"{min_age}+"
+         else:
+            age_Restriction = "All ages"
+
          if not session.query(Event).filter_by(id=ev["id"]).first():
             event_obj = Event(
                 id=ev["id"],
@@ -232,7 +254,8 @@ def fetch_events():
                 predicted_noise="Unknown",
                 description = description,
                 genre = genre,
-                url = url
+                url = url,
+                ageRestriction = age_Restriction
             )
             session.add(event_obj)
 
@@ -250,7 +273,8 @@ def fetch_events():
             "predicted_noise": "Unknown",
             "description": ev.get("info"),
             "genre": genre,
-            "url": url
+            "url": url,
+            "ageRestriction": age_Restriction
         })
 
       #----------FORMATTING TIME AND CREATE EVENT OBJECT END----------#
