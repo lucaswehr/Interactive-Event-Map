@@ -45,10 +45,14 @@ import L, { marker } from "leaflet"
 // allows me to access multiple events in the same spot
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
+
+
 //------------------------------------------------------------------------------//
 //-Links with my App.css file and changes the size and positioning of the image-//
 //------------------------------------------------------------------------------//
 const EventMarker = ({event}) => {
+
+   
 
   const [, forceUpdate] = useState(0);
 
@@ -69,81 +73,78 @@ const EventMarker = ({event}) => {
 
    const markerRef = useRef();
 
-   // allows me to see the popup just by hovering over it
-   useEffect(() => { // this hook is used best when you want to update something constantly.
-     const marker = markerRef.current;
-     if (marker)
-     {
-       const openPopup = () => {
-      if (!isLockedRef.current) marker.openPopup();
-    };
+  //  // allows me to see the popup just by hovering over it
+  //  useEffect(() => { // this hook is used best when you want to update something constantly.
+  //    const marker = markerRef.current;
+  //    if (marker)
+  //    {
+  //      const openPopup = () => {
+  //     if (!isLockedRef.current) marker.openPopup();
+  //   };
 
-    const closePopup = () => {
-      if (!isLockedRef.current) marker.closePopup();
-    };
+  //   const closePopup = () => {
+  //     if (!isLockedRef.current) marker.closePopup();
+  //   };
 
-    const toggleLock = () => {
-      isLockedRef.current = !isLockedRef.current;
+  //   const toggleLock = () => {
+  //     isLockedRef.current = !isLockedRef.current;
      
-      if (isLockedRef.current) {
-        marker.openPopup();
-      } else {
-        marker.closePopup();
-      }
+  //     if (isLockedRef.current) {
+  //       marker.openPopup();
+  //     } else {
+  //       marker.closePopup();
+  //     }
      
-     }
+  //    }
 
-       marker.on("mouseover", openPopup);
-    marker.on("mouseout", closePopup);
-    marker.on("click", toggleLock);
+  //      marker.on("mouseover", openPopup);
+  //   marker.on("mouseout", closePopup);
+  //   marker.on("click", toggleLock);
 
-    return () => {
-      marker.off("mouseover", openPopup);
-      marker.off("mouseout", closePopup);
-      marker.off("click", toggleLock);
-    };
-    }
-   },[]);
+  //   return () => {
+  //     marker.off("mouseover", openPopup);
+  //     marker.off("mouseout", closePopup);
+  //     marker.off("click", toggleLock);
+  //   };
+  //   }
+  //  },[]);
 
-   // this useEffect changes the state of the lock emoji when the user clicks on the marker
-   useEffect(() => {
-    const marker = markerRef.current;
-    if (!marker) return;
+  //  // this useEffect changes the state of the lock emoji when the user clicks on the marker
+  //  useEffect(() => {
+  //   const marker = markerRef.current;
+  //   if (!marker) return;
 
-    const handleClick = () => {
-      isLocked = !isLocked; 
+  //   const handleClick = () => {
+  //     isLocked = !isLocked; 
       
-      const popup = marker.getPopup();
-      if (!popup) return;
-      const container = popup.getContent(); 
+  //     const popup = marker.getPopup();
+  //     if (!popup) return;
+  //     const container = popup.getContent(); 
       
-      const lockSpan = popup._contentNode.querySelector(".lock-emoji");
-      if (lockSpan) {
-        lockSpan.innerHTML = isLocked ? "🔒" : "🔓";
-      }
-    };
+  //     const lockSpan = popup._contentNode.querySelector(".lock-emoji");
+  //     if (lockSpan) {
+  //       lockSpan.innerHTML = isLocked ? "🔒" : "🔓";
+  //     }
+  //   };
 
-    marker.on("click", handleClick);
-    return () => marker.off("click", handleClick);
-  }, []);
+  //   marker.on("click", handleClick);
+  //   return () => marker.off("click", handleClick);
+  // }, []);
 
 return (
     <>
     <Marker key={event.id} position={[event.latitude, event.longitude]} icon={icon} ref={markerRef}>
-      <Popup autoClose={false} closeOnClick={false} maxWidth={8000} minWidth={200}>
+      <Popup autoClose={false} closeOnClick={false} maxWidth={250} minWidth={20}>
         
         <b>{event.name}</b><br/>
         Venue: {event.venue}<br/>
-        Start: {event.start_time}  <span className="lock-emoji" style={{ fontSize: "20px", marginLeft: "200px" }}>🔓</span><br/>
+        Start: {event.start_time}<br/>
        
        {/* target: opens link in a different tab | rel: security reasons, good practice */}
        {event.url && (
        <a href={event.url} target="_blank" rel="noopener noreferrer">Buy Tickets</a>
        )}
-      
-     
 
-       
       <div
       style={{
         maxHeight: "100px", // set the max height
@@ -162,7 +163,7 @@ return (
   </div>
       </Popup>
     </Marker>
-   </>
+    </>
   );  
 };
 
@@ -189,6 +190,7 @@ const Recenter = ({ center }) => {
 function App() 
 {
 
+  const [open, setOpen] = useState(false);
   const [age, setAge] = useState("All ages")
   const [genre, setGenre] = useState("all");
   const[size, setSize] = useState("10");
@@ -201,7 +203,7 @@ function App()
 
   useEffect(() => { // the reactive UI part of the frontend, allows me to see changes without refreshing the page 
 
-    fetch("http://localhost:5000/events") // --> retrieves our data from flask 
+    fetch("http://192.168.88.5:5000/events") // --> retrieves our data from flask 
     .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
     .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
     .catch((err) => console.error(err));
@@ -223,7 +225,7 @@ function App()
     // finding the lat and lon of the searched city
     const handleSearch = (search, size) => {
 
-        fetch(`http://localhost:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
+        fetch(`http://192.168.88.5:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
         .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
         .then(data => setEvents(data))
         .catch((err) => console.error(err));
@@ -254,49 +256,49 @@ function App()
   return (
     <> 
     {/*search bar*/}
+    <div style={{display:"flex",position:"absolute", alignItems:"center",justifyContent:"center", top:"17vh"}}>
       <input 
      type="text"
-     placeholder="Search for city...."
+     placeholder="U.S. city...."
      value={search}
      onChange={(e) => setSearch(e.target.value)}
      style={{
-      position: "absolute",
-      top: 170,
-      left: 740,
-      width: 200,
+      fontSize:"16px",
+      marginLeft:"33vw",
+      width: "30vw",
       zIndex: 1000,  // Make sure it's above the map layers
       padding: "5px 10px",
       borderRadius: "50px",
       border: "3px solid black",
       boxShadow: "2px 8px 10px black",
       outline: "none"
-      
-      }}
-    />
-    
-     <>
-        {/*White background bar behind the size button*/}
-        <div style ={{width: "80px", height: "25px", zIndex: "1000", position:"absolute", backgroundColor: "white", 
-            border: "3px solid black", borderRadius: "30px", marginLeft: "1400px", marginTop: "170px", boxShadow: "2px 8px 10px black" }}>
-        </div>
+      }}/>
 
-        {/* Size button itself along with the text "Size" */}
-        <form style={{position: "absolute", zIndex: "1000", marginLeft: "1406px", marginTop: "173px"}}>
-            <label>
-                Size{' '}
-                <select className="Size" style ={{borderRadius: "30px", border: "3px solid black"}}  value = {size} onChange={e => {const newSize = e.target.value; setSize(newSize)}}>
-                    <option value = "10">10</option>
-                    <option value = "25">25</option>
-                    <option value = "50">50</option>
-                    <option value = "75">75</option>
-                </select>
-            </label>
-        </form>
+      {search && <button className="goButton" onClick={() => handleSearch(search,size)}>GO</button>}
+    </div>
+     <>
+       
         </>
 
-        {/* Filter Button */}
-        <form style={{zIndex: "1000", position: "absolute", marginLeft: "224px", marginTop: "170px"}}>
-          <label>
+
+        {/* Tab Button */}
+        <div className="tab" onClick={() => setOpen(!open)} 
+        style={{transform: open ? "translateX(33vw)" : "translate(0vw)",
+          transition: "transform 0.3s ease"
+        }}>
+          {open ? "<" : ">"}
+        </div>
+
+         {/* Panel from tab */}
+   <div className="panel" 
+         style={{transform: open ? "translateX(0)" : "translate(-34vw)", 
+         transition: "transform 0.3s ease"}}>
+
+
+          {/* Filter Mood Button */}
+     <div style={{display:"flex", flexDirection:"column", gap:"3vh"}}>
+       <form style={{top:"0%", fontSize:"5vw"}}>
+          <label style={{fontWeight: "bold"}}>
             Filter Events:{" "}
             <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {genre} onChange={e => {const newGenre = e.target.value; setGenre(newGenre)}}>
                 <option value = "All">All</option>
@@ -314,7 +316,7 @@ function App()
         </form>
 
         {/* Filter Age Button */}
-         <form style={{zIndex: "1000", position: "absolute", marginLeft: "224px", marginTop: "220px"}}>
+         <form style={{zIndex: "1000", fontSize:"5vw", fontWeight:"bold"}}>
           <label>
             Filter Age:{" "}
             <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {age} onChange={e => {const newAge = e.target.value; setAge(newAge)}}>
@@ -325,38 +327,51 @@ function App()
           </label>
         </form>
 
-         {/*White background bar behind the filter age button*/}
-        <div style ={{width: "159px", height: "25px", zIndex: "900", position:"absolute", backgroundColor: "white", 
-            border: "3px solid black", borderRadius: "30px", marginLeft: "215px", marginTop: "217px" ,boxShadow: "2px 8px 10px black"}}>
-        </div>
+          {/* Size button itself along with the text "Size" */}
+        <form style={{left: "0", fontSize: "5vw", fontWeight: "bold", color: "black"}}>
+            <label style={{zIndex: "1400"}}>
+                Size:{' '}
+                <div></div>
+                <select className="Size" style ={{borderRadius: "30px", border: "2px solid black", zIndex: "1000"}}  value = {size} onChange={e => {const newSize = e.target.value; setSize(newSize)}}>
+                    <option value = "10">10</option>
+                    <option value = "25">25</option>
+                    <option value = "50">50</option>
+                    <option value = "75">75</option>
+                </select>
+                
+            </label>
+        </form> 
+     </div>
 
-         {/*White background bar behind the filter button*/}
-        <div style ={{width: "185px", height: "25px", zIndex: "900", position:"absolute", backgroundColor: "white", 
-            border: "3px solid black", borderRadius: "30px", marginLeft: "215px", marginTop: "167px" ,boxShadow: "2px 8px 10px black"}}>
-        </div>
+    
+    </div>
+       
 
-      {/* GO button when searching for city*/}
-     {search ? <button className="goButton" onClick={() => { // button will only appear if theres text in the search
-      handleSearch(search, size);
-    }}>GO</button> : null}
+    
+
 
 
     {/* Styling the Map*/}
-     <div style={{width:"1697px", height: "150px", backgroundColor:"black", zIndex: "700", position:"absolute", borderRadius: "20px", backgroundColor: "darkolivegreen", boxShadow: "10px 10px 10px black"}}> </div>
-    <div style={{width:"200px", height: "820px", backgroundColor:"black", zIndex: "700", position:"absolute", borderRadius: "20px", backgroundColor: "darkolivegreen", boxShadow: "2px 150px 5px 5px black"}}> </div>
-    <div style={{width:"200px", height: "820px", backgroundColor:"black", zIndex: "700", position:"absolute", borderRadius: "20px", marginLeft: "1497px", backgroundColor:"darkolivegreen", boxShadow: "-10px 150px 10px black"}}> </div> 
-    <div style={{width:"1300px", height: "100px", backgroundColor:"black", zIndex: "600", position:"absolute", borderRadius: "20px", marginTop: "720px", backgroundColor: "darkolivegreen", boxShadow: "1px -10px 10px 0px black", marginLeft: "195px"}}> </div>
-    <div style={{width:"1500px", height: "100px", backgroundColor:"black", zIndex: "800", position:"absolute", borderRadius: "20px", marginTop: "720px", backgroundColor: "darkolivegreen", marginLeft: "100px"}}> </div>
-    <div style={{zIndex: "1000", position: "absolute", left:"50%", transform: "translateX(-50%)",marginTop:"-60px" ,fontSize: "80px", color: "white", fontWeight:"bold", pointerEvents: "none", textShadow: "2px 7px 4px black"}}>
+     <div style={{width:"100vw", height: "clamp(50px, 15%, 150px)", left: "50%",transform: "translateX(-50%)", backgroundColor:"black", zIndex: "700", position:"absolute", backgroundColor: "darkolivegreen", boxShadow: "10px 10px 10px black"}}> 
+       <div className="credits">
+      <p>Made by: Lucas Wehr</p>
+       </div>
+     </div>
+    <div style={{width:"100vw", bottom: "0" ,height: "20px", backgroundColor:"black", zIndex: "600", position:"absolute", borderRadius: "20px", backgroundColor: "darkolivegreen", boxShadow: "1px -10px 10px 0px black"}}> </div> 
+    <div style={{width:"100vw", bottom: "-10%",height: "13%", backgroundColor:"black", zIndex: "800", position:"absolute", backgroundColor: "darkolivegreen"}}> </div> 
+    <div style={{width:"5vw",left: "0",height: "100%", backgroundColor:"black", zIndex: "700", position:"absolute", borderRadius: "20px", backgroundColor: "darkolivegreen", boxShadow: "5px 15vh 10px 5px black"}}></div>
+    <div style={{width:"5vw", right: "0",height: "100%", backgroundColor:"black", zIndex: "700", position:"absolute", borderRadius: "20px", backgroundColor:"darkolivegreen", boxShadow: "-10px 15vh 10px black", }}></div> 
+    
+    <div className="maptext">
       <p>EVENT MAP</p>
     </div>
-    <div style={{zIndex: "1000", position: "absolute",marginTop:"720px" ,fontSize: "30px", color: "white", fontWeight:"bold", pointerEvents: "none", textShadow: "2px 6px 4px black",marginLeft:"20px"}}>
-      <p>Made by: Lucas Wehr</p>
-    </div>
+   
 
 
-       {/* Displays the map itself to the webpage */}
-    <MapContainer center={center} zoom={10} style={{ height: "100vh", width: "100%" }}>
+
+      {/* Displays the map itself to the webpage */}
+      <div style={{height:"100vh", width:"100vw"}}>
+    <MapContainer center={center} zoom={10} style={{flexGrow: "1", height: "100%", width: "95%"}} zoomControl={false}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" // --> opens template for openstreetmap which has a free licence. x,y,z are zoom/tile coordinates
         attribution="&copy; OpenStreetMap contributors" // required by their licence
@@ -369,7 +384,7 @@ function App()
 
             // Filter by genre first
             const genreMatch = genre.toLowerCase() === "all" || event.predicted_vibe.toLowerCase() === genre.toLowerCase();
-
+    
             // Normalize age values
             const eventAge = event.ageRestriction ? event.ageRestriction.trim() : "All ages";
             const selectedAge = age ? age.trim() : "All ages";
@@ -385,6 +400,7 @@ function App()
 
       <Recenter center = {center} />
     </MapContainer>
+    </div>
 </>
   );
 

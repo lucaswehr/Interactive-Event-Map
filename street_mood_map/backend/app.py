@@ -25,7 +25,7 @@ import redis # --> allows me to use cache my data (If this project was ever to s
 import json
 import re
 
-cache = redis.Redis(host='localhost', port=6379, db=0) # --> connects to redis for caching
+cache = redis.Redis(host="0.0.0.0", port=6379, db=0) # --> connects to redis for caching
 
 load_dotenv() # --> gets my hidden api key
 
@@ -294,4 +294,4 @@ def fetch_events():
 #---------------------------------------------------------------------------------------------------#
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0', port=5000)

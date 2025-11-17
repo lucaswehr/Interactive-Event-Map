@@ -64,13 +64,13 @@ color:red;
 
 .goButton{
 
-  position:absolute;
-  z-index: 1000;
-  left: 920px;
-  top: 174px;
+  
+  z-index: 10005;
+  margin-left: -45px;
   border-radius: 10px; 
   background-color: lightgray;
   border: 3px solid black;
+  color:black;
   
 }
 
@@ -81,6 +81,16 @@ color:red;
 
 }
 
+.Filter {
+
+  position: relative;
+  top: 120%;
+  left: 3%;
+  font-size: 3vw;
+  color:black;
+}
+
+
 .Filter:hover{
 
   background-color: rgb(219, 219, 219);
@@ -90,4 +100,89 @@ color:red;
 .Size:hover{
   background-color: rgb(219, 219, 219);
   cursor:pointer;
+}
+
+.map-containter {
+
+ flex-grow: 1;
+  width: 100vw;
+  height: 100vh;
+}
+
+.maptext {
+
+  z-index: 1000;
+  position:absolute;
+  font-size: clamp(50px, 10vw, 80px);
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  text-shadow: 2px 7px 4px black;
+  font-weight: bold;
+  color: white;
+  pointer-events: none;
+  text-align: center;
+
+}
+
+.credits {
+
+  position: relative;
+  z-index: 1005;
+  display: flex;
+  
+  top: 8dvh;
+  
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  
+
+   text-shadow: 2px 4px 3px black;;
+  
+}
+
+.tab {
+
+  width: 5vw;
+  height: 20vh;
+  top: 40%;
+  position: absolute;
+  z-index: 1002;
+  background-color: white;
+  border-radius: 0 10px 10px 0;
+  text-align: center;
+  font-weight: bold;
+
+  justify-content: center;
+  align-items: center;
+  display: flex;
+
+   border:  3px solid black;
+   box-shadow: 5px 5px 10px black;
+  
+}
+
+.panel {
+
+  width: 35vw;
+  height: 100vh;
+  background-color: gray;
+  position: absolute;
+  z-index: 1000;
+  border: 3px solid black;
+  box-shadow: 5px 5px 10px black;
+  z-index: 1001;
+  font-size: 3vw;
+  padding: px;
+
+}
+
+.Size {
+  position: relative;
+  color:black;
+  font-size: 3vw;
+  left: 3%;
+  
 }
