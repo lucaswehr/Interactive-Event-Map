@@ -12,35 +12,41 @@ from sqlalchemy.orm import sessionmaker # --> allows us to add/update/delete/que
 
 Base = declarative_base() # --> creates base class, anything inhereting base will be added to the database table
 
-engine = create_engine('sqlite:///events.db', echo=False) # --> establishes connection to the database. Echo is useful for debugging
+engine = create_engine('mysql+pymysql://lucas_user:Pugs7891@localhost/eventmap', echo=False) # --> establishes connection to the database. Echo is useful for debugging
 
 Session = sessionmaker(bind=engine) # --> creates a session factory
 session = Session() # --> creates an actual session object that allows me to preform CRUD
 
 class Event(Base): # creates individual columns for each row
     __tablename__ = 'events'
-    id = Column(String, primary_key=True) # --> this will be our primary key to find specific events
-    name = Column(String)
-    venue = Column(String)
-    venue_city = Column(String)
+    id = Column(String(300), primary_key=True) # --> this will be our primary key to find specific events
+    name = Column(String(300))
+    venue = Column(String(300))
+    venue_city = Column(String(100))
     latitude = Column(Float)
     longitude = Column(Float)
     start_time = Column(DateTime)
     venue_capacity = Column(Integer)
-    image_url = Column(String, nullable=True)
+    image_url = Column(String(3000), nullable=True)
     predicted_crowd = Column(Integer)
-    predicted_vibe = Column(String)
-    predicted_noise = Column(String)
-    description = Column(String, nullable=True)
-    genre = Column(String)
-    url = Column(String)
-    ageRestriction = Column(String)
+    predicted_vibe = Column(String(100))
+    predicted_noise = Column(String(100))
+    description = Column(String(3000), nullable=True)
+    genre = Column(String(200))
+    url = Column(String(1000))
+    ageRestriction = Column(String(10))
     
 
 
 Base.metadata.create_all(engine)
 
 
+try:
+    conn = engine.connect()
+    print("Connected to MySQL!")
+    conn.close()
+except Exception as e:
+    print("Error connecting:", e)
 
 
 

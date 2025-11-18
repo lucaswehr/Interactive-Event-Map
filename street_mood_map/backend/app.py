@@ -33,7 +33,13 @@ Session = sessionmaker(bind=engine)
 
 API_KEY = os.getenv("TICKET_MASTER_API_KEY")
 
+now = datetime.utcnow()
+session.query(Event).filter(Event.start_time < now).delete() # deletes old events in the database
+session.commit()
+
 app = Flask(__name__)
+
+print("Count in MySQL before fetch:", session.query(Event).count())
 
 CORS(app) # --> browsers block two different ports being ran i.e React and Flask. 
 # this allows my Flask API to call React as well. Kind of like a 2 in 1 button 
@@ -51,6 +57,8 @@ def hello():
 @app.route('/events') # --> Returns all stored maps in JSON which is then 
 # ready for React. We need to convert to JSON so that React can understand it
 def get_events():
+    
+    session = Session() # --> Opens a new database session to interact with mySQL
     events = session.query(Event).all()
 
     return jsonify([{ # --> loops through each row and jsonifies it 
@@ -109,13 +117,10 @@ def fetch_events():
      
      session = Session() # --> Opens a new database session to interact with SQLite
 
-     size = request.args.get("size", 1)
+     size = request.args.get("size", 1).strip().lower()
      size = int(size)
      city = request.args.get("city", "Seattle")
-     now = datetime.utcnow()
-
-     session.query(Event).filter(Event.start_time < now).delete() # deletes old events in the database
-     session.commit()
+   
     
      url = "https://app.ticketmaster.com/discovery/v2/events" # --> Finds events 
 
@@ -189,7 +194,7 @@ def fetch_events():
 
      #----------FORMATTING TIME AND CREATING EVENT OBJECT---------#
 
-     events_list = []  # initialize before your loop
+     events_list = []  
 
      for ev in events:
          venue = ev["_embedded"]["venues"][0] # --> fetches the first venue of the event
@@ -239,6 +244,8 @@ def fetch_events():
          else:
             age_Restriction = "All ages"
 
+
+         #-------Adds the events to the database-------#
          if not session.query(Event).filter_by(id=ev["id"]).first():
             event_obj = Event(
                 id=ev["id"],
@@ -259,13 +266,14 @@ def fetch_events():
             )
             session.add(event_obj)
 
+            #-------returns the new events straight to the frontend-------#
             events_list.append({
             "id": ev["id"],
             "name": ev["name"],
             "venue": venue["name"],
             "venue_city": city,
-            "latitude": float(venue["location"]["latitude"]),
-            "longitude": float(venue["location"]["longitude"]),
+            "latitude": float(venue["location"]["latitude"]) if "location" in venue else None,
+            "longitude": float(venue["location"]["longitude"]) if "location" in venue else None,
             "start_time": start_time.isoformat() if start_time else None,
             "image_url": ev.get("images", [{}])[0].get("url", None),
             "predicted_crowd": 0,
@@ -275,7 +283,9 @@ def fetch_events():
             "genre": genre,
             "url": url,
             "ageRestriction": age_Restriction
+
         })
+
 
       #----------FORMATTING TIME AND CREATE EVENT OBJECT END----------#
 

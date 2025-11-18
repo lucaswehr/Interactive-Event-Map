@@ -73,64 +73,6 @@ const EventMarker = ({event}) => {
 
    const markerRef = useRef();
 
-  //  // allows me to see the popup just by hovering over it
-  //  useEffect(() => { // this hook is used best when you want to update something constantly.
-  //    const marker = markerRef.current;
-  //    if (marker)
-  //    {
-  //      const openPopup = () => {
-  //     if (!isLockedRef.current) marker.openPopup();
-  //   };
-
-  //   const closePopup = () => {
-  //     if (!isLockedRef.current) marker.closePopup();
-  //   };
-
-  //   const toggleLock = () => {
-  //     isLockedRef.current = !isLockedRef.current;
-     
-  //     if (isLockedRef.current) {
-  //       marker.openPopup();
-  //     } else {
-  //       marker.closePopup();
-  //     }
-     
-  //    }
-
-  //      marker.on("mouseover", openPopup);
-  //   marker.on("mouseout", closePopup);
-  //   marker.on("click", toggleLock);
-
-  //   return () => {
-  //     marker.off("mouseover", openPopup);
-  //     marker.off("mouseout", closePopup);
-  //     marker.off("click", toggleLock);
-  //   };
-  //   }
-  //  },[]);
-
-  //  // this useEffect changes the state of the lock emoji when the user clicks on the marker
-  //  useEffect(() => {
-  //   const marker = markerRef.current;
-  //   if (!marker) return;
-
-  //   const handleClick = () => {
-  //     isLocked = !isLocked; 
-      
-  //     const popup = marker.getPopup();
-  //     if (!popup) return;
-  //     const container = popup.getContent(); 
-      
-  //     const lockSpan = popup._contentNode.querySelector(".lock-emoji");
-  //     if (lockSpan) {
-  //       lockSpan.innerHTML = isLocked ? "🔒" : "🔓";
-  //     }
-  //   };
-
-  //   marker.on("click", handleClick);
-  //   return () => marker.off("click", handleClick);
-  // }, []);
-
 return (
     <>
     <Marker key={event.id} position={[event.latitude, event.longitude]} icon={icon} ref={markerRef}>
@@ -138,7 +80,7 @@ return (
         
         <b>{event.name}</b><br/>
         Venue: {event.venue}<br/>
-        Start: {event.start_time}<br/>
+        Start: {event.start_time} PST<br/>
        
        {/* target: opens link in a different tab | rel: security reasons, good practice */}
        {event.url && (
@@ -203,7 +145,7 @@ function App()
 
   useEffect(() => { // the reactive UI part of the frontend, allows me to see changes without refreshing the page 
 
-    fetch("http://192.168.88.5:5000/events") // --> retrieves our data from flask 
+    fetch("http://192.168.88.6:5000/events") // --> retrieves our data from flask 
     .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
     .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
     .catch((err) => console.error(err));
@@ -225,9 +167,9 @@ function App()
     // finding the lat and lon of the searched city
     const handleSearch = (search, size) => {
 
-        fetch(`http://192.168.88.5:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
+        fetch(`http://192.168.88.6:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
         .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
-        .then(data => setEvents(data))
+         .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
         .catch((err) => console.error(err));
 
 
@@ -239,8 +181,8 @@ function App()
           const { lat, lng } = data.results[0].geometry;
           setCenter([lat, lng]); // triggers Recenter
           setTimeout(() => {
-          window.location.reload();
-        }, 2000); 
+  window.location.reload();
+}, 2000);
         } else {
           alert("City not found!");
         }
@@ -259,7 +201,7 @@ function App()
     <div style={{display:"flex",position:"absolute", alignItems:"center",justifyContent:"center", top:"17vh"}}>
       <input 
      type="text"
-     placeholder="U.S. city...."
+     placeholder="U.S. City...."
      value={search}
      onChange={(e) => setSearch(e.target.value)}
      style={{
@@ -342,8 +284,6 @@ function App()
             </label>
         </form> 
      </div>
-
-    
     </div>
        
 
