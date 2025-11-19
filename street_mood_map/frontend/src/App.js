@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"; 
+
 //------------------------------------------------------------------------------------------//
 //  ^ lets us build componenets
 
@@ -28,6 +29,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 // my css file that changes the style of the event icons
 import './App.css' 
+import Panel from './Panel'
 
 // componenets that make up the dynamic map
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'; 
@@ -52,15 +54,8 @@ import MarkerClusterGroup from 'react-leaflet-markercluster';
 //------------------------------------------------------------------------------//
 const EventMarker = ({event}) => {
 
-   
+ const [, forceUpdate] = useState(0); // trick to re-render
 
-  const [, forceUpdate] = useState(0);
-
-   let isLocked = false; // plain JS variable
-
-  const isLockedRef = useRef(false);
-  const seeMoreRef = useRef(false);
-  const [eventDescrption, setEventDescription] = useState(null)
   const icon = L.divIcon({
    html: `<div class="custom_marker">
           <img src= "${event.image_url}" alt="Event"/>
@@ -71,7 +66,15 @@ const EventMarker = ({event}) => {
   className: "" // important: disable default Leaflet icon class
   });
 
+  
+
+
    const markerRef = useRef();
+
+  const attending = useRef(
+  Number(localStorage.getItem(`attending_${event.id}`)) || 0
+);
+  
 
 return (
     <>
@@ -81,7 +84,12 @@ return (
         <b>{event.name}</b><br/>
         Venue: {event.venue}<br/>
         Start: {event.start_time} PST<br/>
-       
+        
+      <div>
+        I will be attending:
+       <input type="checkbox"style={{marginLeft:"5px"}} />
+      </div>
+
        {/* target: opens link in a different tab | rel: security reasons, good practice */}
        {event.url && (
        <a href={event.url} target="_blank" rel="noopener noreferrer">Buy Tickets</a>
@@ -97,6 +105,7 @@ return (
         paddingTop: "5px",
        }}
        > 
+        <p><strong>Crowd Size: </strong>{attending.current}</p>
         <p><strong>Genre: </strong>{event.genre}</p>
         <p><strong>Description:</strong> {event.description} </p>
         <p><strong>Vibe: </strong>{event.predicted_vibe}</p>
@@ -121,8 +130,6 @@ const Recenter = ({ center }) => {
   return null;
 };
 
-
-
 // React Component: Like HTML <div> but with more logic to it. Its like a
 //its own block of code that could be HTML or JS
 
@@ -132,11 +139,13 @@ const Recenter = ({ center }) => {
 function App() 
 {
 
+  const [timeFilter, setTimeFilter] = useState("0")
+  const [goButton, setButton] = useState(true)
   const [open, setOpen] = useState(false);
   const [age, setAge] = useState("All ages")
   const [genre, setGenre] = useState("all");
   const[size, setSize] = useState("10");
- const [center, setCenter] = useState(() => { // this useState remembers the current center even if the page is refreshed
+  const [center, setCenter] = useState(() => { // this useState remembers the current center even if the page is refreshed
   const savedCenter = localStorage.getItem("mapCenter");
   return savedCenter ? JSON.parse(savedCenter) : [47.6062, -122.3321]; // Seattle as fallback
 });
@@ -167,6 +176,7 @@ function App()
     // finding the lat and lon of the searched city
     const handleSearch = (search, size) => {
 
+       setButton(false)
         fetch(`http://192.168.88.6:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
         .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
          .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
@@ -181,8 +191,9 @@ function App()
           const { lat, lng } = data.results[0].geometry;
           setCenter([lat, lng]); // triggers Recenter
           setTimeout(() => {
-  window.location.reload();
-}, 2000);
+         window.location.reload();
+          setButton(true)
+          }, 2000);
         } else {
           alert("City not found!");
         }
@@ -190,6 +201,7 @@ function App()
          .catch(err => console.error(err));
       }
 
+     
       useEffect(() => {
   console.log("Events updated:", events);
 }, [events]);
@@ -198,25 +210,26 @@ function App()
   return (
     <> 
     {/*search bar*/}
-    <div style={{display:"flex",position:"absolute", alignItems:"center",justifyContent:"center", top:"17vh"}}>
-      <input 
-     type="text"
-     placeholder="U.S. City...."
-     value={search}
-     onChange={(e) => setSearch(e.target.value)}
-     style={{
-      fontSize:"16px",
-      marginLeft:"33vw",
-      width: "30vw",
-      zIndex: 1000,  // Make sure it's above the map layers
-      padding: "5px 10px",
-      borderRadius: "50px",
-      border: "3px solid black",
-      boxShadow: "2px 8px 10px black",
-      outline: "none"
+    <div style={{display:"flex",position:"absolute", alignItems:"center",justifyContent:"space-between", top:"17vh"}}>
+      
+      <span style={{position:"absolute",marginLeft:"52%",zIndex:"1001"}}>🔍</span>
+      <input type="text" placeholder= "U.S. City...." value={search} onChange={(e) => setSearch(e.target.value)}
+        style={{
+        fontSize:"16px",
+        marginLeft:"33vw",
+        width: "30vw",
+        zIndex: 1000,  // Make sure it's above the map layers
+        padding: "5px 10px",
+        borderRadius: "50px",
+        border: "3px solid black",
+        boxShadow: "2px 8px 10px black",
+        outline: "none",
+        textIndent:"23px"
       }}/>
 
-      {search && <button className="goButton" onClick={() => handleSearch(search,size)}>GO</button>}
+      
+
+      {search && goButton && <button className="goButton" onClick={() => handleSearch(search,size)}>GO</button>}
     </div>
      <>
        
@@ -231,87 +244,26 @@ function App()
           {open ? "<" : ">"}
         </div>
 
-         {/* Panel from tab */}
-   <div className="panel" 
-         style={{transform: open ? "translateX(0)" : "translate(-34vw)", 
-         transition: "transform 0.3s ease"}}>
-
-
-          {/* Filter Mood Button */}
-     <div style={{display:"flex", flexDirection:"column", gap:"3vh"}}>
-       <form style={{top:"0%", fontSize:"5vw"}}>
-          <label style={{fontWeight: "bold"}}>
-            Filter Events:{" "}
-            <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {genre} onChange={e => {const newGenre = e.target.value; setGenre(newGenre)}}>
-                <option value = "All">All</option>
-                <option value = "Exciting">Exciting</option>
-                <option value = "Intense">Intense</option>
-                <option value = "Smooth">Smooth</option>
-                <option value = "Laid-Back">Laid-Back</option>
-                <option value = "Energetic">Energetic</option>
-                <option value = "Dramatic">Dramatic</option>
-                <option value = "Classy">Classy</option>
-                <option value = "Quirky">Quirky</option>
-                <option value = "Upbeat">Upbeat</option> 
-            </select>
-          </label>
-        </form>
-
-        {/* Filter Age Button */}
-         <form style={{zIndex: "1000", fontSize:"5vw", fontWeight:"bold"}}>
-          <label>
-            Filter Age:{" "}
-            <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {age} onChange={e => {const newAge = e.target.value; setAge(newAge)}}>
-                <option value = "All ages">All Ages</option>
-                <option value = "18+">18+</option>
-                <option value = "21+">21+</option>
-            </select>
-          </label>
-        </form>
-
-          {/* Size button itself along with the text "Size" */}
-        <form style={{left: "0", fontSize: "5vw", fontWeight: "bold", color: "black"}}>
-            <label style={{zIndex: "1400"}}>
-                Size:{' '}
-                <div></div>
-                <select className="Size" style ={{borderRadius: "30px", border: "2px solid black", zIndex: "1000"}}  value = {size} onChange={e => {const newSize = e.target.value; setSize(newSize)}}>
-                    <option value = "10">10</option>
-                    <option value = "25">25</option>
-                    <option value = "50">50</option>
-                    <option value = "75">75</option>
-                </select>
-                
-            </label>
-        </form> 
-     </div>
-    </div>
-       
-
-    
-
-
-
+         {/* Function that contains filter buttons and the panel that slides over */}
+         <Panel timeFilter ={timeFilter} genre = {genre} open = {open}  size = {size} age = {age} setGenre = {setGenre} setAge = {setAge} setSize={setSize} setTimeFilter={setTimeFilter}/>
+         
     {/* Styling the Map*/}
-     <div style={{width:"100vw", height: "clamp(50px, 15%, 150px)", left: "50%",transform: "translateX(-50%)", backgroundColor:"black", zIndex: "700", position:"absolute", backgroundColor: "darkolivegreen", boxShadow: "10px 10px 10px black"}}> 
-       <div className="credits">
-      <p>Made by: Lucas Wehr</p>
-       </div>
+     <div style={{width:"95vw", height: "clamp(50px, 15%, 150px)", left: "50%",transform: "translateX(-50%)", backgroundColor:"black", zIndex: "700", position:"absolute", backgroundColor: "darkolivegreen", boxShadow: "10px 10px 10px black"}}> 
+      <div className="credits"> <p>Made by: Lucas Wehr</p></div>
      </div>
-    <div style={{width:"100vw", bottom: "0" ,height: "20px", backgroundColor:"black", zIndex: "600", position:"absolute", borderRadius: "20px", backgroundColor: "darkolivegreen", boxShadow: "1px -10px 10px 0px black"}}> </div> 
-    <div style={{width:"100vw", bottom: "-10%",height: "13%", backgroundColor:"black", zIndex: "800", position:"absolute", backgroundColor: "darkolivegreen"}}> </div> 
-    <div style={{width:"5vw",left: "0",height: "100%", backgroundColor:"black", zIndex: "700", position:"absolute", borderRadius: "20px", backgroundColor: "darkolivegreen", boxShadow: "5px 15vh 10px 5px black"}}></div>
-    <div style={{width:"5vw", right: "0",height: "100%", backgroundColor:"black", zIndex: "700", position:"absolute", borderRadius: "20px", backgroundColor:"darkolivegreen", boxShadow: "-10px 15vh 10px black", }}></div> 
-    
-    <div className="maptext">
-      <p>EVENT MAP</p>
-    </div>
-   
 
+    <div style={{width:"98vw", bottom: "0" ,height: "20px", backgroundColor:"black", zIndex: "600", position:"absolute", backgroundColor: "darkolivegreen", boxShadow: "1px -10px 10px 0px black"}}> </div> 
+    <div style={{width:"100vw", bottom: "-16%",height: "18%", backgroundColor:"black", zIndex: "800", position:"absolute", backgroundColor: "darkolivegreen"}}> </div> 
+    <div style={{width:"5vw",left: "0",height: "100%", backgroundColor:"black", zIndex: "700", position:"absolute", backgroundColor: "darkolivegreen", boxShadow: "5px 15vh 10px 5px black"}}></div>
+    <div style={{width:"5vw", right: "0",height: "100%", backgroundColor:"black", zIndex: "700", position:"absolute", backgroundColor:"darkolivegreen", boxShadow: "-10px 15vh 10px black", }}></div> 
+    
+    <div className="maptext"><p>EVENT MAP</p></div>
+    {/* Styling the Map End */}
 
 
       {/* Displays the map itself to the webpage */}
       <div style={{height:"100vh", width:"100vw"}}>
-    <MapContainer center={center} zoom={10} style={{flexGrow: "1", height: "100%", width: "95%"}} zoomControl={false}>
+    <MapContainer center={center} zoom={10} style={{flexGrow: "1", height: "95%", width: "95%"}} zoomControl={false}>
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" // --> opens template for openstreetmap which has a free licence. x,y,z are zoom/tile coordinates
         attribution="&copy; OpenStreetMap contributors" // required by their licence
@@ -331,7 +283,31 @@ function App()
 
             const ageMatch = selectedAge === "All ages" || eventAge === selectedAge;
 
-            return genreMatch && ageMatch;
+            // Parse event start date safely (MM-DD-YYYY)
+            const [monthStr, dayStr, yearStr] = event.start_time.split("-");
+            const month = parseInt(monthStr, 10);
+            const day = parseInt(dayStr, 10);
+            const year = parseInt(yearStr, 10);
+
+            const eventDate = new Date(year, month - 1, day); // JS months are 0-indexed
+            if (isNaN(eventDate)) return false; // skip invalid dates
+            // Get tomorrow's date
+            const now = new Date();
+            let value = 0;
+
+           if (timeFilter === "2") value = 1;
+           else if (timeFilter === "3") value = 7;
+           else if (timeFilter === "4") value = 31;
+           
+
+            if (timeFilter === "0")
+            {
+              return genreMatch && ageMatch
+            }
+
+            const filterTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + value);
+ 
+            return genreMatch && ageMatch && (eventDate <= filterTime);
           })
           .map(event => ( // loops through all my events in the useState
         <EventMarker key={event.id} event={event}/>

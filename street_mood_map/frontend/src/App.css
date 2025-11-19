@@ -84,12 +84,11 @@ color:red;
 .Filter {
 
   position: relative;
-  top: 120%;
-  left: 3%;
-  font-size: 3vw;
+  font-size: 2vw;
   color:black;
+  box-shadow: 2px 8px 10px black;
+  
 }
-
 
 .Filter:hover{
 
@@ -161,28 +160,60 @@ color:red;
 
    border:  3px solid black;
    box-shadow: 5px 5px 10px black;
+   cursor:pointer;
   
 }
 
 .panel {
 
   width: 35vw;
-  height: 100vh;
-  background-color: gray;
+  height: 115%;
+  background-color: rgb(27, 27, 30);
   position: absolute;
-  z-index: 1000;
+  z-index: 10000;
   border: 3px solid black;
   box-shadow: 5px 5px 10px black;
   z-index: 1001;
   font-size: 3vw;
-  padding: px;
-
-}
-
-.Size {
-  position: relative;
-  color:black;
-  font-size: 3vw;
-  left: 3%;
+  border-radius: 0px 15px 15px 0px;
   
 }
+
+.nowButton{
+  position: relative;
+  width:30vw;
+}
+
+/* Chrome, Safari, Edge */
+.nowButton::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 30px;      
+  height: 30px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #000000;
+  
+}
+
+/* Firefox */
+.nowButton::-moz-range-thumb {
+   -webkit-appearance: none;
+  appearance: none;
+  width: 25px;      
+  height: 25px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #333;
+}
+
+.filterTimeText{
+  font-size: 2vw;
+  font-weight: bold;
+  align-items: center;
+  color:white;
+  margin-left: 3vw;
+  margin-top: -28px;
+} 

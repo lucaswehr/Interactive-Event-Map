@@ -2,17 +2,22 @@
 #--------------------------------------------SQLite CREATION IMPLEMENTATION--------------------------------------------#
 #----------------------------------------------------------------------------------------------------------------------#
 
-from sqlalchemy import create_engine,Column,String,Integer,Float, DateTime # --> Engine: connects to SQLite
+from sqlalchemy import create_engine,Column,String,Integer,Float, DateTime # --> Engine: connects to mySQL
 from sqlalchemy.ext.declarative import declarative_base # ---> creates a base class, any class that inherets from base becomes a table in the database
 from sqlalchemy.orm import sessionmaker # --> allows us to add/update/delete/query rows in the database
-
+import os
+from dotenv import load_dotenv
 #-------------------------------------------------------------------------------------------------------------#
 #-SQLAlchemy allows me to make a object and bundle all these attributes up instead of writing raw SQL queries
 #-------------------------------------------------------------------------------------------------------------#
 
 Base = declarative_base() # --> creates base class, anything inhereting base will be added to the database table
 
-engine = create_engine('mysql+pymysql://lucas_user:Pugs7891@localhost/eventmap', echo=False) # --> establishes connection to the database. Echo is useful for debugging
+load_dotenv() # --> gets my hidden password
+
+PASSWORD = os.getenv("PASSWORD")
+
+engine = create_engine(f'mysql+pymysql://lucas_user:{PASSWORD}@localhost/eventmap', echo=False) # --> establishes connection to the database. Echo is useful for debugging
 
 Session = sessionmaker(bind=engine) # --> creates a session factory
 session = Session() # --> creates an actual session object that allows me to preform CRUD

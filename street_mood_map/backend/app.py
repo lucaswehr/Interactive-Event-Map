@@ -59,26 +59,28 @@ def hello():
 def get_events():
     
     session = Session() # --> Opens a new database session to interact with mySQL
-    events = session.query(Event).all()
 
-    return jsonify([{ # --> loops through each row and jsonifies it 
-        "id": e.id,
-        "name": e.name,
-        "venue": e.venue,
-        "venue_city": e.venue_city,
-        "latitude": e.latitude,
-        "longitude": e.longitude,
-        "start_time": e.start_time.strftime("%m-%d-%Y | %I:%M %p %Z"),  # formats my time so that its not in military time and have the time zone
-        "image_url": e.image_url,
-        "predicted_crowd": e.predicted_crowd,
-        "predicted_vibe": e.predicted_vibe,
-        "predicted_noise": e.predicted_noise,
-        "description": e.description,
-        "genre": e.genre,
-        "url": e.url,
-        "ageRestriction": e.ageRestriction
+    with Session() as session: # --> automatically closes the session
+      events = session.query(Event).all()
 
-    } for e in events])
+      return jsonify([{ # --> loops through each row and jsonifies it 
+         "id": e.id,
+         "name": e.name,
+         "venue": e.venue,
+         "venue_city": e.venue_city,
+         "latitude": e.latitude,
+         "longitude": e.longitude,
+         "start_time": e.start_time.strftime("%m-%d-%Y | %I:%M %p %Z"),  # formats my time so that its not in military time and have the time zone
+         "image_url": e.image_url,
+         "predicted_crowd": e.predicted_crowd,
+         "predicted_vibe": e.predicted_vibe,
+         "predicted_noise": e.predicted_noise,
+         "description": e.description,
+         "genre": e.genre,
+         "url": e.url,
+         "ageRestriction": e.ageRestriction
+      } for e in events])
+
 #-------------------------------CONVERTS DATA TO JSON END----------------------------------#
 
 
