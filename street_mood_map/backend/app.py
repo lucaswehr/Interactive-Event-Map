@@ -10,7 +10,7 @@
 
 from sqlalchemy import inspect
 from flask import Flask, jsonify, request, Response
-from create_db import session, Event, engine
+from create_db import session, Event, engine, UserEvent
 from flask_cors import CORS # --> allows React to make requests to my flask without being blocked by browsers
 from dotenv import load_dotenv # --> I stored my api key in a seperate file so that its private and no one can see it. This allows me do that
 import os # --> allows me to access variables outside of this file (i.e API_KEY)
@@ -24,6 +24,7 @@ import redis # --> allows me to use cache my data (If this project was ever to s
 # will retrive it instantly, completely skipping the querying and database entirely.)
 import json
 import re
+import uuid
 
 cache = redis.Redis(host="0.0.0.0", port=6379, db=0) # --> connects to redis for caching
 
@@ -32,10 +33,6 @@ load_dotenv() # --> gets my hidden api key
 Session = sessionmaker(bind=engine)
 
 API_KEY = os.getenv("TICKET_MASTER_API_KEY")
-
-now = datetime.utcnow()
-session.query(Event).filter(Event.start_time < now).delete() # deletes old events in the database
-session.commit()
 
 app = Flask(__name__)
 
@@ -59,6 +56,10 @@ def hello():
 def get_events():
     
     session = Session() # --> Opens a new database session to interact with mySQL
+
+    now = datetime.utcnow()
+    session.query(Event).filter(Event.start_time < now).delete() # deletes old events in the database
+    session.commit()
 
     with Session() as session: # --> automatically closes the session
       events = session.query(Event).all()
@@ -95,7 +96,7 @@ def getVibe(genre):
     "Laid-Back": ["Country", "Folk", "Soft Rock", "Acoustic"],
     "Intense": ["Metal", "Hard Rock", "Punk"],
     "Quirky": ["Indie", "Alternative", "Experimental"],
-    "Dramatic": ["Theater", "Musical", "Opera", "Theatre"],
+    "Dramatic": ["Theater", "Musical", "Opera", "Theatre","Drama"],
     "Exciting": [ "Football", "Soccer", "Basketball", "Baseball", "Hockey", "Tennis", "Golf", "Cricket", "Rugby", "Volleyball", "Motorsports", "Action"],
     "Playful": ["Comedy", "Family Shows", "Improv"],
     "Futuristic": ["Electronic", "EDM", "Synthwave"]
@@ -300,6 +301,66 @@ def fetch_events():
      return jsonify({"events": events_list, "status": "success"}), 200
 
 #---------------------------TICKETMASTER API IMPLEMENTATION END---------------------------#
+
+#---------------------------ADDING USER EVENTS TO DATABASE---------------------------#
+@app.route('/add-user-event', methods=["POST"])
+def userEvent():
+
+   session = Session()
+   data = request.json
+
+   newEvent = UserEvent(
+      id=str(uuid.uuid4()),
+      name = data.get("name"),
+      venue = data.get("venue"),
+      venue_city = data.get("venue_city"),
+      latitude = data.get("latitude"),
+      longitude = data.get("longitude"),
+      start_time=data.get("start_time"),
+      venue_capacity=data.get("venue_capacity", 0),
+      image_url=data.get("image_url"),
+      description=data.get("description"),
+      genre=data.get("genre"),
+      ageRestriction=data.get("ageRestriction"),
+   )
+
+   session.add(newEvent)
+   session.commit()
+   new_event = newEvent.id
+   session.close()
+
+   return jsonify({"status": "success", "id": new_event})
+
+
+
+@app.route('/get-user-events') # --> Returns all stored maps in JSON which is then 
+# ready for React. We need to convert to JSON so that React can understand it
+def get_user_events():
+    
+    session = Session() # --> Opens a new database session to interact with mySQL
+
+    now = datetime.utcnow()
+    session.query(UserEvent).filter(UserEvent.start_time < now).delete() # deletes old events in the database
+    session.commit()
+
+    with Session() as session: # --> automatically closes the session
+      events = session.query(UserEvent).all()
+
+      return jsonify([{ # --> loops through each row and jsonifies it 
+         "id": e.id,
+         "name": e.name,
+         "venue": e.venue,
+         "venue_city": e.venue_city,
+         "latitude": e.latitude,
+         "longitude": e.longitude,
+         "start_time": e.start_time.strftime("%m-%d-%Y | %I:%M %p %Z"),  # formats my time so that its not in military time and have the time zone
+         "image_url": e.image_url,
+         "description": e.description,
+         "genre": e.genre,
+         "ageRestriction": e.ageRestriction
+      } for e in events])
+
+#---------------------------ADDING USER EVENTS TO DATABASE END---------------------------#
      
 #---------------------------------------------------------------------------------------------------#
 #-----------------------------------WEBSITE EXTENTIONS END------------------------------------------#

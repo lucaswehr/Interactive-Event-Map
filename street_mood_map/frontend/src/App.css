@@ -44,12 +44,17 @@
  width: 50px;
  border-radius: 50%;
  border: 3px solid white ;
- box-shadow: 0 0 10px black;
- object-fit: cover;
- display:block;
-
-
+ box-shadow: 0 10px 10px black;
+ 
+  
 }
+
+.custom_marker:hover {
+
+   transition: transform 0.3s ease;
+    transform: translateY(-10px);
+}
+
 
 .active {
 
@@ -87,7 +92,7 @@ color:red;
   font-size: 2vw;
   color:black;
   box-shadow: 2px 8px 10px black;
-  
+  width:15vw;
 }
 
 .Filter:hover{

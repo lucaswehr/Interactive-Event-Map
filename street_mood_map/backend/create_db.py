@@ -42,6 +42,21 @@ class Event(Base): # creates individual columns for each row
     ageRestriction = Column(String(10))
     
 
+class UserEvent(Base): # creates individual columns for each row
+    __tablename__ = 'user_events'
+    id = Column(String(300), primary_key=True) # --> this will be our primary key to find specific events
+    name = Column(String(300))
+    venue = Column(String(300))
+    venue_city = Column(String(100))
+    latitude = Column(Float)
+    longitude = Column(Float)
+    start_time = Column(DateTime)
+    venue_capacity = Column(Integer)
+    image_url = Column(String(3000), nullable=True)
+    description = Column(String(3000), nullable=True)
+    genre = Column(String(200))
+    ageRestriction = Column(String(10))
+
 
 Base.metadata.create_all(engine)
 

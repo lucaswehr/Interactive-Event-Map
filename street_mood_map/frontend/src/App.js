@@ -22,6 +22,8 @@ import React, { useEffect, useRef, useState } from "react";
 // if the dependincy array was [], that means it only runs once 
 //------------------------------------------------------------------------------------------//
 
+import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
+
 // CSS Files with the map 
 import 'leaflet/dist/leaflet.css'; 
 import 'leaflet.markercluster/dist/MarkerCluster.css';
@@ -54,46 +56,69 @@ import MarkerClusterGroup from 'react-leaflet-markercluster';
 //------------------------------------------------------------------------------//
 const EventMarker = ({event}) => {
 
+ const [isSaved, setisSaved] = useState(false)
  const [, forceUpdate] = useState(0); // trick to re-render
 
+ useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("savedEvents") || "[]");
+    setisSaved(saved.includes(event.id))
+ }, [event.id])
+
+
+ const toggleSave = () => {
+
+  let saved = JSON.parse(localStorage.getItem("savedEvents") || "[]");
+
+  if (saved.includes(event.id)) {
+  saved = saved.filter(id => id !== event.id);
+} else {
+  saved.push(event.id);
+}
+
+localStorage.setItem("savedEvents", JSON.stringify(saved));
+setisSaved(!isSaved);
+
+
+ }
   const icon = L.divIcon({
    html: `<div class="custom_marker">
           <img src= "${event.image_url}" alt="Event"/>
           </div>`,
           
   iconSize: [50, 50],
-  popupAnchor: [20,-10],
+  popupAnchor: [25,-20],
   className: "" // important: disable default Leaflet icon class
   });
 
-  
-
-
    const markerRef = useRef();
-
-  const attending = useRef(
-  Number(localStorage.getItem(`attending_${event.id}`)) || 0
-);
   
-
 return (
     <>
     <Marker key={event.id} position={[event.latitude, event.longitude]} icon={icon} ref={markerRef}>
       <Popup autoClose={false} closeOnClick={false} maxWidth={250} minWidth={20}>
-        
-        <b>{event.name}</b><br/>
+
+        <div onClick={toggleSave} style={{ display: "flex" }}>
+        <b style={{flex:1}}>{event.name} </b><br/>
+
+        <div style={{cursor:"pointer"}}>
+        {isSaved ? (
+        <BsBookmarkFill size={24} color="gold" />
+        ) : (
+          <BsBookmark size={24} color="gold"/>
+        )}
+        </div>
+        </div>
+
         Venue: {event.venue}<br/>
         Start: {event.start_time} PST<br/>
-        
-      <div>
-        I will be attending:
-       <input type="checkbox"style={{marginLeft:"5px"}} />
-      </div>
+    
 
        {/* target: opens link in a different tab | rel: security reasons, good practice */}
        {event.url && (
        <a href={event.url} target="_blank" rel="noopener noreferrer">Buy Tickets</a>
        )}
+
+       
 
       <div
       style={{
@@ -105,7 +130,7 @@ return (
         paddingTop: "5px",
        }}
        > 
-        <p><strong>Crowd Size: </strong>{attending.current}</p>
+        
         <p><strong>Genre: </strong>{event.genre}</p>
         <p><strong>Description:</strong> {event.description} </p>
         <p><strong>Vibe: </strong>{event.predicted_vibe}</p>
@@ -139,6 +164,7 @@ const Recenter = ({ center }) => {
 function App() 
 {
 
+  const [showSaved, setshowSaved] = useState(false)
   const [timeFilter, setTimeFilter] = useState("0")
   const [goButton, setButton] = useState(true)
   const [open, setOpen] = useState(false);
@@ -154,11 +180,18 @@ function App()
 
   useEffect(() => { // the reactive UI part of the frontend, allows me to see changes without refreshing the page 
 
-    fetch("http://192.168.88.6:5000/events") // --> retrieves our data from flask 
+    fetch("http://192.168.0.107:5000/events") // --> retrieves our data from flask 
     .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
     .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
     .catch((err) => console.error(err));
   }, [])
+
+  useEffect(() => {
+    fetch("http://192.168.0.107:5000/get-user-events")
+    .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
+    .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
+    .catch((err) => console.error(err));
+  },[])
 
   useEffect(() => { // constantly stores/remembers the new center when it changes 
   localStorage.setItem("mapCenter", JSON.stringify(center));
@@ -177,7 +210,7 @@ function App()
     const handleSearch = (search, size) => {
 
        setButton(false)
-        fetch(`http://192.168.88.6:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
+        fetch(`http://192.168.0.107:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
         .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
          .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
         .catch((err) => console.error(err));
@@ -203,8 +236,34 @@ function App()
 
      
       useEffect(() => {
-  console.log("Events updated:", events);
-}, [events]);
+        console.log("Events updated:", events);
+      }, [events]);
+
+      async function submitUserEvent()
+       {
+         const dummyEvent = {
+        name: "Test Event2",
+         venue: "Some Venue",        // <- add this
+        venue_city: "Seattle",
+        latitude: 147.6062,
+        longitude: -122.3321,
+        start_time: "2025-11-25T20:00:00",
+        venue_capacity: 100,
+        image_url: "",
+        description: "Just a test",
+        genre: "Exciting",
+        ageRestriction: "18+"
+    };
+          const response = await fetch("http://192.168.0.107:5000/add-user-event", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dummyEvent)
+          });
+
+          const data = await response.json();
+          console.log(data);
+          
+       }
 
 
   return (
@@ -245,8 +304,9 @@ function App()
         </div>
 
          {/* Function that contains filter buttons and the panel that slides over */}
-         <Panel timeFilter ={timeFilter} genre = {genre} open = {open}  size = {size} age = {age} setGenre = {setGenre} setAge = {setAge} setSize={setSize} setTimeFilter={setTimeFilter}/>
+         <Panel showSaved={showSaved}timeFilter ={timeFilter} genre = {genre} open = {open}  size = {size} age = {age} setGenre = {setGenre} setAge = {setAge} setSize={setSize} setTimeFilter={setTimeFilter} setshowSaved={setshowSaved}/>
          
+        
     {/* Styling the Map*/}
      <div style={{width:"95vw", height: "clamp(50px, 15%, 150px)", left: "50%",transform: "translateX(-50%)", backgroundColor:"black", zIndex: "700", position:"absolute", backgroundColor: "darkolivegreen", boxShadow: "10px 10px 10px black"}}> 
       <div className="credits"> <p>Made by: Lucas Wehr</p></div>
@@ -260,6 +320,12 @@ function App()
     <div className="maptext"><p>EVENT MAP</p></div>
     {/* Styling the Map End */}
 
+    {/* Add Event button */}
+    <div style={{display:"flex", justifyContent:"center"}}>
+      <div onClick={submitUserEvent}style={{width:"100px", height:"30px", position:"absolute", display:"flex", alignItems:"center", justifyContent:"center",zIndex:10000, backgroundColor:"white", marginTop:"25vh", fontSize:"10px", borderRadius:"10px", outline:"3px solid black",boxShadow: "0px 8px 10px black"}}>
+          Add Event
+      </div>
+    </div>
 
       {/* Displays the map itself to the webpage */}
       <div style={{height:"100vh", width:"100vw"}}>
@@ -291,21 +357,26 @@ function App()
 
             const eventDate = new Date(year, month - 1, day); // JS months are 0-indexed
             if (isNaN(eventDate)) return false; // skip invalid dates
-            // Get tomorrow's date
+          
             const now = new Date();
             let value = 0;
 
-           if (timeFilter === "2") value = 1;
-           else if (timeFilter === "3") value = 7;
-           else if (timeFilter === "4") value = 31;
-           
+            if (timeFilter === "2") value = 1;
+            else if (timeFilter === "3") value = 7;
+            else if (timeFilter === "4") value = 31;
 
+            const savedEventIds = JSON.parse(localStorage.getItem("savedEvents") || "[]");
+           
+             if (showSaved) {
+               return savedEventIds.includes(event.id); // only show saved events
+             }
+          
             if (timeFilter === "0")
             {
-              return genreMatch && ageMatch
+              return genreMatch && ageMatch 
             }
 
-            const filterTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + value);
+            const filterTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + value); // filters all events by the date it begins
  
             return genreMatch && ageMatch && (eventDate <= filterTime);
           })

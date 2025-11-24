@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"; 
 
-function Panel({timeFilter,genre,open,age,size, setGenre, setAge, setSize, setTimeFilter}) 
+function Panel({showSaved,timeFilter,genre,open,age,size, setGenre, setAge, setSize, setTimeFilter, setshowSaved}) 
 {
     const [filterValue, setfilterValue] = useState("0")
    const sliderTimeout = useRef(null); // persists across renders
@@ -48,7 +48,7 @@ function Panel({timeFilter,genre,open,age,size, setGenre, setAge, setSize, setTi
                 <option value = "Quirky">Quirky</option>
                 <option value = "Upbeat">Upbeat</option> 
             </select>
-            <span style={{marginLeft:"1vw"}}>∨</span>
+            <span style={{marginLeft:"1vw"}}></span>
           </label>
         </form>
 
@@ -67,7 +67,7 @@ function Panel({timeFilter,genre,open,age,size, setGenre, setAge, setSize, setTi
                 <option value = "18+">18+</option>
                 <option value = "21+">21+</option>
             </select>
-            <span style={{marginLeft:"1vw"}}>∨</span>
+            <span style={{marginLeft:"1vw"}}></span>
           </label>
 
            
@@ -83,7 +83,7 @@ function Panel({timeFilter,genre,open,age,size, setGenre, setAge, setSize, setTi
                     <option value = "50">50</option>
                     <option value = "75">75</option>
                 </select>
-                <span style={{marginLeft:"1vw"}}>∨</span>
+                <span style={{marginLeft:"1vw"}}></span>
             </label>
         </form> 
 
@@ -93,30 +93,22 @@ function Panel({timeFilter,genre,open,age,size, setGenre, setAge, setSize, setTi
             </div>
          </div>
         
-            {timeFilter === "0" && 
-         <p className="filterTimeText">All</p>
-            }
+            {timeFilter === "0" &&   <p className="filterTimeText">All</p>  }
        
-          <div>
-            {timeFilter === "1" && 
-         <p className="filterTimeText">Today</p>
-            }
-             <div>
-            {timeFilter === "2" && 
-         <p className="filterTimeText">Tomorrow</p>
-            }
-        </div>
-         <div>
-            {timeFilter === "3" && 
-         <p className="filterTimeText">This Week</p>
-            }
-        </div>
-         <div>
-            {timeFilter === "4" && 
-         <p className="filterTimeText">This Month</p>
-            }
-        </div>
-        </div>
+      <div>
+          {timeFilter === "1" && <p className="filterTimeText">Today</p>}
+
+         <div>{timeFilter === "2" && <p className="filterTimeText">Tomorrow</p>}</div>
+
+         <div>{timeFilter === "3" && <p className="filterTimeText">This Week</p>}</div>
+
+         <div>{timeFilter === "4" && <p className="filterTimeText">This Month</p>}</div> 
+      </div>
+
+         <div style={{fontSize: "2.5vw", fontWeight: "bold", display:"flex", alignItems:"center",color: "white", fontWeight: "bold", marginLeft: "1vw",zIndex: "10000", marginTop:"-7vh"}}> Saved Events
+           <input type="checkbox" style={{position:"relative",marginLeft:"5vw", width:"3vw",height:"3vh"}} checked={showSaved} onChange={(e) => setshowSaved(e.target.checked)}></input>
+         </div>
+
      </div>
     
     </div>
