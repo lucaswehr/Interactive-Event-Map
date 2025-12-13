@@ -1,0 +1,242 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.custom_marker img {
+
+ height:50px;
+ width: 50px;
+ border-radius: 50%;
+ border: 3px solid white ;
+ box-shadow: 0 10px 10px black;
+ 
+  
+}
+
+.custom_marker:hover {
+
+   transition: transform 0.3s ease;
+    transform: translateY(-10px);
+}
+
+
+.active {
+
+color:red;
+
+}
+
+.inactive {
+
+  color:green;
+}
+
+.goButton{
+
+  
+  z-index: 10005;
+  margin-left: -45px;
+  border-radius: 10px; 
+  background-color: lightgray;
+  border: 3px solid black;
+  color:black;
+  
+}
+
+
+.goButton:hover{
+
+  background-color: rgb(173, 173, 173);
+
+}
+
+.Filter {
+
+  position: relative;
+  font-size: 2vw;
+  color:black;
+  box-shadow: 2px 8px 10px black;
+  width:15vw;
+}
+
+.Filter:hover{
+
+  background-color: rgb(219, 219, 219);
+  cursor:pointer;
+}
+
+.Size:hover{
+  background-color: rgb(219, 219, 219);
+  cursor:pointer;
+}
+
+.map-containter {
+
+ flex-grow: 1;
+  width: 100vw;
+  height: 100vh;
+}
+
+.maptext {
+
+  z-index: 1000;
+  position:absolute;
+  font-size: clamp(50px, 10vw, 80px);
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  text-shadow: 2px 7px 4px black;
+  font-weight: bold;
+  color: white;
+  pointer-events: none;
+  text-align: center;
+
+}
+
+.credits {
+
+  position: relative;
+  z-index: 1005;
+  display: flex;
+  
+  top: 8dvh;
+  
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  
+
+   text-shadow: 2px 4px 3px black;;
+  
+}
+
+.tab {
+
+  width: 5vw;
+  height: 20vh;
+  top: 40%;
+  position: absolute;
+  z-index: 1002;
+  background-color: white;
+  border-radius: 0 10px 10px 0;
+  text-align: center;
+  font-weight: bold;
+
+  justify-content: center;
+  align-items: center;
+  display: flex;
+
+   border:  3px solid black;
+   box-shadow: 5px 5px 10px black;
+   cursor:pointer;
+  
+}
+
+.panel {
+
+  width: 35vw;
+  height: 115%;
+  background-color: rgb(27, 27, 30);
+  position: absolute;
+  z-index: 10000;
+  border: 3px solid black;
+  box-shadow: 5px 5px 10px black;
+  z-index: 1001;
+  font-size: 3vw;
+  border-radius: 0px 15px 15px 0px;
+  
+}
+
+.nowButton{
+  position: relative;
+  width:30vw;
+}
+
+/* Chrome, Safari, Edge */
+.nowButton::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 30px;      
+  height: 30px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #000000;
+  
+}
+
+/* Firefox */
+.nowButton::-moz-range-thumb {
+   -webkit-appearance: none;
+  appearance: none;
+  width: 25px;      
+  height: 25px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #333;
+}
+
+.filterTimeText{
+  font-size: 2vw;
+  font-weight: bold;
+  align-items: center;
+  color:white;
+  margin-left: 3vw;
+  margin-top: -28px;
+} 
+
+.add-event-button:hover{
+  cursor: pointer;
+  background-color: rgb(219, 219, 219);
+}
+
+.add-event-button{
+  background-color: white;
+}
+
+.submit{
+  background-color: white;
+}
+
+.submit:hover{
+  background-color: rgb(219, 219, 219);
+  cursor:pointer;
+}
