@@ -54,7 +54,7 @@ import MarkerClusterGroup from 'react-leaflet-markercluster';
 //------------------------------------------------------------------------------//
 //-Links with my App.css file and changes the size and positioning of the image-//
 //------------------------------------------------------------------------------//
-const EventMarker = ({event}) => {
+const EventMarker = ({event, view}) => {
 
  const [isSaved, setisSaved] = useState(false)
  const [, forceUpdate] = useState(0); // trick to re-render
@@ -82,7 +82,7 @@ setisSaved(!isSaved);
  }
   const icon = L.divIcon({
    html: `<div class="custom_marker">
-          <img src= "${event.image_url}" alt="Event"/>
+          <img src= "${view === "user" ? `http://192.168.0.104:5000${event.image_url}` : event.image_url}" alt="Event"/>
           </div>`,
           
   
@@ -110,7 +110,12 @@ return (
         </div>
         </div>
 
+        
         Venue: {event.venue}<br/>
+        
+        {view === "user" &&
+        <p>Date: {event.start_date}</p>
+        }
         Start: {event.start_time} PST<br/>
     
 
@@ -136,6 +141,10 @@ return (
         <p><strong>Description:</strong> {event.description} </p>
         <p><strong>Vibe: </strong>{event.predicted_vibe}</p>
         <p><strong>Age Restrictions: </strong>{event.ageRestriction}</p>
+
+       {view === "user" &&
+        <p><strong>Capacity: </strong>{event.venue_capacity}</p>
+       }
 
   </div>
       </Popup>
@@ -178,23 +187,33 @@ function App()
   return savedCenter ? JSON.parse(savedCenter) : [47.6062, -122.3321]; // Seattle as fallback
 });
   const [events, setEvents] = useState([])
+  const [userEvents, setUserEvents] = useState([])
   const [search, setSearch] = useState(""); // stores current search input
 
   useEffect(() => { // the reactive UI part of the frontend, allows me to see changes without refreshing the page 
 
-    if (View === "ticketmaster"){
-    fetch("http://192.168.0.105:5000/events") // --> retrieves our data from flask 
-    .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
-    .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
-    .catch((err) => console.error(err));
-    }
-    else if (View === "user"){
-     fetch("http://192.168.0.105:5000/get-user-events")
-    .then((res => res.json())) 
-    .then(data => setEvents(data)) 
-    .catch((err) => console.error(err));
-    }
+     const swtichEvents = async () => {
 
+      try{
+      const url = View === "user" ? "http://192.168.0.104:5000/get-user-events" : "http://192.168.0.104:5000/events";
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (View === "ticketmaster")
+      {
+        setEvents(data);
+      }
+      else if (View === "user")
+      {
+        setUserEvents(data);
+      }
+
+      }
+      catch (err) {
+        console.error(err)
+      }
+    }
+     swtichEvents();
   }, [View])
 
   useEffect(() => {
@@ -219,14 +238,14 @@ function App()
     const handleSearch = (search, size) => {
 
        setButton(false)
-        fetch(`http://192.168.0.105:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
+        fetch(`http://192.168.0.104:5000/fetch-events?city=${search}&size=${size}`) // sends the desired city and event size to the backend
         .then((res => res.json())) // --> .then: a "Promise" meaning that it waits for the fetch to finsih and then this line will run
          .then(data => setEvents(data)) // --> waits for the response to be converted to json then it'll run
         .catch((err) => console.error(err));
 
 
         // Fetch coordinates (lat,lon) from OpenCage API
-        fetch(`http://192.168.0.105:5000/api/geocode?address=${encodeURIComponent(search)}`)  
+        fetch(`http://192.168.0.104:5000/api/geocode?address=${encodeURIComponent(search)}`)  
         .then(res => res.json())
         .then(data => {
         if (data.lat && data.lng) {
@@ -317,10 +336,11 @@ function App()
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" // --> opens template for openstreetmap which has a free licence. x,y,z are zoom/tile coordinates
         attribution="&copy; OpenStreetMap contributors" // required by their licence
       />
+
+
       <MarkerClusterGroup chunkedLoading={true} maxClusterRadius={50}  spiderfyDistanceMultiplier={2}>
-      
-      
-      {filteredEvents
+  
+      {(View === "user" ? userEvents : events)  
           .filter(event =>  { // filters all the events the user selects, if "all", it returns all events
             
             // Filter by genre first
@@ -335,7 +355,7 @@ function App()
 
             // Parse event start date safely (MM-DD-YYYY)
 
-            if (View == "ticketmaster")
+            if (View == "ticketmaster" && event.start_time)
             {
               const [monthStr, dayStr, yearStr] = event.start_time.split("-");
               month = parseInt(monthStr, 10);
@@ -368,10 +388,11 @@ function App()
  
             return genreMatch && ageMatch && (eventDate <= filterTime);
           })
+           
             .filter(event => event.latitude != null && event.longitude != null)
           .map(event => ( // loops through all my events in the useState
-        <EventMarker key={event.id} event={event}/>
-      ))}
+        <EventMarker key={event.id} event={event} view={View}/> 
+      ))} 
       </MarkerClusterGroup>
 
       <Recenter center = {center} />

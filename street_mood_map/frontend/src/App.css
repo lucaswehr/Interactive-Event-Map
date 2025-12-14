@@ -233,10 +233,27 @@ color:red;
 }
 
 .submit{
-  background-color: white;
+  background-color: blue;
 }
 
 .submit:hover{
-  background-color: rgb(219, 219, 219);
+ 
   cursor:pointer;
+  transform: translateY(-5px);
+  transition: transform 0.3s ease;
+
 }
+
+.submit:active{
+  transform: translateY(5px);
+}
+
+.homeButton{
+ background-color: white;
+}
+
+.homeButton:hover{
+  cursor: pointer;
+  background-color: rgb(219, 219, 219);
+}
+

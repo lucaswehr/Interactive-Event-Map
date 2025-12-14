@@ -9,7 +9,7 @@
 #--------------------------------------------------------------------------------------------#
 
 from sqlalchemy import inspect, and_
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, send_from_directory
 from create_db import session, Event, engine, UserEvent
 from flask_cors import CORS # --> allows React to make requests to my flask without being blocked by browsers
 from dotenv import load_dotenv # --> I stored my api key in a seperate file so that its private and no one can see it. This allows me do that
@@ -25,6 +25,10 @@ import redis # --> allows me to use cache my data (If this project was ever to s
 import json
 import re
 import uuid
+from werkzeug.utils import secure_filename
+
+
+
 
 cache = redis.Redis(host="0.0.0.0", port=6379, db=0) # --> connects to redis for caching
 
@@ -36,6 +40,14 @@ API_KEY = os.getenv("TICKET_MASTER_API_KEY")
 GEO_KEY = os.getenv("GEO_KEY")
 
 app = Flask(__name__)
+
+# Creates the file path to uploads i.e. moodmapproject/streetmoodmap/backend/uploads/etc
+# Guarentees that the uploads file exists
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 print("Count in MySQL before fetch:", session.query(Event).count())
 
@@ -309,19 +321,18 @@ def fetch_events():
 def userEvent():
 
    session = Session()
-   data = request.json
+   data = request.form
 
-   start_date_str = data.get("start_date")  # e.g., "2025-12-06"
-   start_time_str = data.get("start_time")  # e.g., "09:00"
+   file = request.files.get('image_url') # Gets my image url from the frontend
+   filename = secure_filename(file.filename) # Prevents malicious paths to my image and takes out unsafe characters such as >,<, or ?
+   file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) # Stores the file into the uploads folder
+   image_url = f"/uploads/{filename}"  # This is whats stored into the Database and is used in the front end as event.image_url
 
+   print("------------------------------------------")
    print("Received start_date:", data.get("start_date"))
    print("Received start_time:", data.get("start_time"))
+   print("------------------------------------------")
 
-   # Convert strings to date/time objects
-   start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d").date() if start_date_str else None
-   start_time_obj = datetime.strptime(start_time_str, "%H:%M").time() if start_time_str else None
-
-   
    newEvent = UserEvent(
       id=str(uuid.uuid4()),
       name = data.get("name"),
@@ -329,17 +340,15 @@ def userEvent():
       venue_city = data.get("venue_city"),
       latitude = data.get("latitude"),
       longitude = data.get("longitude"),
-      start_time=start_time_obj,
+      start_time= data.get("start_time"),
       venue_capacity=data.get("venue_capacity", 0),
-      image_url=data.get("image_url"),
+      image_url=image_url,
       description=data.get("description"),
       genre=data.get("genre"),
       ageRestriction=data.get("ageRestriction"),
-      start_date=start_date_obj
+      start_date= data.get("start_date")
    )
 
-   print("------------------------------------------------")
-   print(newEvent)
    session.add(newEvent)
    session.commit()
    new_event = newEvent.id
@@ -371,12 +380,14 @@ def get_user_events():
          "venue_city": e.venue_city,
          "latitude": e.latitude,
          "longitude": e.longitude,
-         "start_time": e.start_time.strftime("%H:%M") if e.start_time else None,
+         "start_time": e.start_time,
          "image_url": e.image_url,
          "description": e.description,
          "genre": e.genre,
          "ageRestriction": e.ageRestriction,
-         "start_date": e.start_date.strftime("%Y-%m-%d") if e.start_date else None
+         "start_date": e.start_date,
+         "venue_capacity": e.venue_capacity
+
       } for e in events])
 
 #---------------------------ADDING USER EVENTS TO DATABASE END---------------------------#
@@ -406,7 +417,13 @@ def geoCode():
         "lng": loc["lng"]
     }
 
-     
+
+# Looks into the upload folder and returns whatever image is in the uploads/<filename>
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    # send_from_directory ensures that only the uploads/image.png is used and not the entire file path
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 #---------------------------------------------------------------------------------------------------#
 #-----------------------------------WEBSITE EXTENTIONS END------------------------------------------#
 #---------------------------------------------------------------------------------------------------#

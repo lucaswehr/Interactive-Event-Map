@@ -50,13 +50,13 @@ class UserEvent(Base): # creates individual columns for each row
     venue_city = Column(String(100))
     latitude = Column(Float)
     longitude = Column(Float)
-    start_time = Column(Time)
+    start_time = Column(String(10))
     venue_capacity = Column(Integer)
     image_url = Column(String(3000), nullable=True)
     description = Column(String(3000), nullable=True)
     genre = Column(String(200))
     ageRestriction = Column(String(10))
-    start_date = Column(Date)
+    start_date = Column(String(20))
 
 
 Base.metadata.create_all(engine)
