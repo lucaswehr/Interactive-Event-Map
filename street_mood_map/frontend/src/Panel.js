@@ -28,30 +28,57 @@ function Panel({View,showSaved,timeFilter,genre,open,age,size, setGenre, setAge,
 
           {/* Filter Mood Button */}
      <div style={{display:"flex", flexDirection:"column", gap:"4vh", marginTop:"2vh"}}>
-       <form style={{fontSize:"2.5vw"}}>
-          <label style={{display: "grid",
-            gridTemplateColumns: "1fr 1fr auto",
-            alignItems: "center",
-            color: "white",
-            fontWeight: "bold",
-            width: "90%",
-            marginLeft:"1vw"}}>
-            Filter Events  
-            <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {genre} onChange={e => {const newGenre = e.target.value; setGenre(newGenre)}}>
-                <option value = "All">All</option>
-                <option value = "Exciting">Exciting</option>
-                <option value = "Intense">Intense</option>
-                <option value = "Smooth">Smooth</option>
-                <option value = "Laid-Back">Laid-Back</option>
-                <option value = "Energetic">Energetic</option>
-                <option value = "Dramatic">Dramatic</option>
-                <option value = "Classy">Classy</option>
-                <option value = "Quirky">Quirky</option>
-                <option value = "Upbeat">Upbeat</option> 
-            </select>
-            <span style={{marginLeft:"1vw"}}></span>
-          </label>
-        </form>
+
+      {View === "ticketmaster" &&
+        <form style={{fontSize:"2.5vw"}}>
+            <label style={{display: "grid",
+              gridTemplateColumns: "1fr 1fr auto",
+              alignItems: "center",
+              color: "white",
+              fontWeight: "bold",
+              width: "90%",
+              marginLeft:"1vw"}}>
+              Filter Events  
+              <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {genre} onChange={e => {const newGenre = e.target.value; setGenre(newGenre)}}>
+                  <option value = "All">All</option>
+                  <option value = "Exciting">Exciting</option>
+                  <option value = "Intense">Intense</option>
+                  <option value = "Smooth">Smooth</option>
+                  <option value = "Laid-Back">Laid-Back</option>
+                  <option value = "Energetic">Energetic</option>
+                  <option value = "Dramatic">Dramatic</option>
+                  <option value = "Classy">Classy</option>
+                  <option value = "Quirky">Quirky</option>
+                  <option value = "Upbeat">Upbeat</option> 
+              </select>
+              <span style={{marginLeft:"1vw"}}></span>
+            </label>
+          </form>
+        }
+
+
+        {View === "user" &&
+          <form style={{fontSize:"2.5vw"}}>
+            <label style={{display: "grid",
+              gridTemplateColumns: "1fr 1fr auto",
+              alignItems: "center",
+              color: "white",
+              fontWeight: "bold",
+              width: "90%",
+              marginLeft:"1vw"}}>
+              Filter Events  
+                    <select className="Filter" style={{borderRadius: "30px", outline: "solid black 2px"}} value = {genre} onChange={e => {const newGenre = e.target.value; setGenre(newGenre)}}>
+                        <option value = "All">All</option>
+                        <option value = "Sports">Sports</option>
+                        <option value = "Music">Music</option>
+                        <option value = "Comedy">Comedy</option>
+                        <option value = "Play">Play</option>
+                        <option value = "Other">Other</option>
+                    </select>
+                    <span style={{marginLeft:"1vw"}}></span>
+              </label>
+            </form>
+        }
 
         {/* Filter Age Button */}
          <form style={{zIndex: "1000", fontSize:"2.5vw", fontWeight:"bold"}}>
@@ -94,9 +121,12 @@ function Panel({View,showSaved,timeFilter,genre,open,age,size, setGenre, setAge,
             </div>
          </div>
         
-            {timeFilter === "0" &&   <p className="filterTimeText">All</p>  }
+          
        
       <div>
+
+          {timeFilter === "0" &&   <p className="filterTimeText">All</p>  }
+
           {timeFilter === "1" && <p className="filterTimeText">Today</p>}
 
          <div>{timeFilter === "2" && <p className="filterTimeText">Tomorrow</p>}</div>

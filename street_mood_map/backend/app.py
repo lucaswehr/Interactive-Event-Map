@@ -55,6 +55,14 @@ CORS(app) # --> browsers block two different ports being ran i.e React and Flask
 # this allows my Flask API to call React as well. Kind of like a 2 in 1 button 
 # #instead of manually running both ports
 
+def to_standard_time(time_24):
+    hour, minute = map(int, time_24.split(":"))
+    period = "AM" if hour < 12 else "PM"
+    hour = hour % 12
+    if hour == 0:
+        hour = 12
+    return f"{hour}:{minute:02d} {period}"
+
 #------------------------------------------------------------------------------------------------------#
 #---------------------------------------WEBSITE EXTENSIONS---------------------------------------------#
 #------------------------------------------------------------------------------------------------------#
@@ -340,7 +348,7 @@ def userEvent():
       venue_city = data.get("venue_city"),
       latitude = data.get("latitude"),
       longitude = data.get("longitude"),
-      start_time= data.get("start_time"),
+      start_time= to_standard_time(data.get("start_time")),
       venue_capacity=data.get("venue_capacity", 0),
       image_url=image_url,
       description=data.get("description"),
