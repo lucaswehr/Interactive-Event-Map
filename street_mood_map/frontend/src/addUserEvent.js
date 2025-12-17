@@ -15,14 +15,16 @@ function User()
     latitude: "",
     longitude: "",
     start_time: "",
-    venue_capacity: "",
+    venue_capacity: "10",
     image_url: "",
     description: "",
-    genre: "",
+    genre: "Sports",
     ageRestriction: "All Ages",
     start_date: "",
     venue: "N/A",
     });
+
+    const capacityOptions = [10, 100, 250, 500, 1000, 2500, 5000, 10000];
 
     async function getGeoAddress()
     {
@@ -118,7 +120,8 @@ function User()
        <div style={{display: "flex",position:"fixed", zIndex:1005, backgroundColor: "darkolivegreen", width:"100%", height:"100%"}}>
          
          <div className="homeButton"onClick={() => setBackground(false)} style={{ width:"50px", height:"5vh", zIndex:1000, position:"absolute", borderRadius:"10px", border:"3px solid black", alignContent:"center", textAlign:"center", bottom:"1vh", left:"1vw",boxShadow:"2px 3px 10px black"}}>
-          Home</div>
+         <strong> Home </strong>
+          </div>
 
        </div>
 
@@ -127,56 +130,69 @@ function User()
      
           <div style={{display:"flex",flexDirection:"column", gap:"7vh", alignItems:"center", justifyContent:"center", marginTop:"15vh"}}> 
               
-            <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white", textShadow:"2px 3px 0px black"}}>
+            <div className="addEventTexts">
                   <strong>Event Name</strong>
               <input name="name" value={form.name} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
             </div>
 
-            <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white", textShadow:"2px 3px 0px black"}}>
+            <div className="addEventTexts">
                   <strong>Venue</strong>
-              <input name="venue" value={form.venue} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+              <input name="venue" value={form.venue} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
             </div>
 
-            <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white",textShadow:"2px 3px 0px black"}}>
+            <div className="addEventTexts">
                   <strong>Start Time</strong>
-              <input name="start_time" value={form.start_time} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="time" style={{ color:"black",marginLeft:"-10px",width:"120%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+              <input className="HTML-Sensitive-Buttons" name="start_time" value={form.start_time} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="time"></input>
             </div>
 
-            <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white", textShadow:"2px 3px 0px black"}}>
+            <div className="addEventTexts">
                   <strong>Start Date</strong> 
-              <input name="start_date" value={form.start_date} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="date" style={{color:"black",width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+              <input className="HTML-Sensitive-Buttons" name="start_date" value={form.start_date} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="date"></input>
             </div>
 
-            
-            <div style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white",textShadow:"2px 3px 0px black"}}>
-                  <strong>Address</strong> 
-              <input  value={address} onChange={(e) => setAddress(e.target.value)} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
-            </div>
-        
-              <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white", textShadow:"2px 3px 0px black"}}>
-                    <strong>Genre</strong>
-                <input name="genre" value={form.genre} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+            <div className="addEventTexts" >
+                  <strong>Genre Select</strong> 
+                    <select className="HTML-Sensitive-Buttons" name="genre" style={{textIndent:"3px"}}  value={form.genre} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))}>
+                      <option value = "Sports">Sports </option>
+                      <option value = "Music">Music</option>
+                      <option value = "Comedy">Comedy</option>
+                      <option value = "Play">Play</option>
+                      <option value = "Other">Other </option>
+                      
+                  </select>
               </div>
 
-              <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white", textShadow:"2px 3px 0px black"}}>
-                    <strong>Age Restriction</strong>
-                <input name="ageRestriction" value={form.ageRestriction} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+            <div className="addEventTexts" >
+                  <strong>Age Restrictions</strong> 
+                    <select className="HTML-Sensitive-Buttons" name="ageRestriction" style={{textIndent:"3px"}}value={form.ageRestriction} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))}>
+                      <option value = "All Ages">All Ages</option>
+                      <option value = "18+">18+</option>
+                      <option value = "21+">21+</option>   
+                  </select>
               </div>
 
-              <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white", textShadow:"2px 3px 0px black"}}>
+              <div className="addEventTexts" >
                     <strong>Venue Capacity</strong>
-                <input  name="venue_capacity" value={form.venue_capacity} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+                <input className="venueCapacityBar" name="venue_capacity" value={capacityOptions.indexOf(form.venue_capacity)} onChange={(e) => setForm(prev => ({ ...prev, venue_capacity: capacityOptions[e.target.value]}))} type="range" min="0" max={capacityOptions.length - 1} step="1" style={{color:"black"}}></input>
+                    <strong>{form.venue_capacity}+</strong>
               </div>
-
-              <div  style={{zIndex:10000, alignItems:"start", display:"flex", flexDirection:"column", gap:"1vh", color:"white", textShadow:"2px 3px 0px black"}}>
+            
+            <div className="addEventTexts">
+                  <strong>Address</strong> 
+              <input  value={address} onChange={(e) => setAddress(e.target.value)} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+            </div>
+    
+                
+              <div className="addEventTexts">
                     <strong>Description</strong>
-                <textarea name="description" value={form.description} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"15vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></textarea>
+                <textarea name="description" value={form.description} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"15vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></textarea>
               </div> 
 
-              <div  style={{zIndex:10000, alignItems:"center", display:"flex", flexDirection:"column", gap:"1vh", color:"white",textShadow:"2px 3px 0px black"}}>
-                    <strong>Image URL</strong>
+              <div className="addEventTexts">
+                    <strong>Image</strong>
 
-                    <button onClick={() => document.getElementById("imageInput").click()} style={{cursor:"pointer",color:"black",width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", fontSize:"16px",boxShadow:"2px 8px 10px black"}}> Select Image</button>
+                    <button onClick={() => document.getElementById("imageInput").click()} style={{cursor:"pointer",color:"black",width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", fontSize:"16px",boxShadow:"2px 8px 10px black"}}>
+                       Select Image</button>
                 <input id="imageInput" type="file" hidden accept="image/*" name="image_url" onChange={(e) => setForm(prev => ({ ...prev, image_url: e.target.files[0] }))}></input>
                 </div>
 
@@ -190,7 +206,7 @@ function User()
                 {form.image_url.name}
 
                  <div className="submit" onClick={handleChange} style={{ color:"white",width:"200px", height:"5vh", zIndex:10000,borderRadius:"10px", outline:"3px solid black", alignContent:"center", textAlign:"center", boxShadow:"2px 8px 10px black", marginTop:"4vh"}}>
-                  Submit
+                  <strong>Submit</strong>
                   </div>
            
                </div>      

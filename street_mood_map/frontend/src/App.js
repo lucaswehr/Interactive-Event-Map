@@ -139,7 +139,11 @@ return (
         
         <p><strong>Genre: </strong>{event.genre}</p>
         <p><strong>Description:</strong> {event.description} </p>
+
+        {view === "ticketmaster" &&
         <p><strong>Vibe: </strong>{event.predicted_vibe}</p>
+        }
+
         <p><strong>Age Restrictions: </strong>{event.ageRestriction}</p>
 
        {view === "user" &&
@@ -181,6 +185,7 @@ function App()
   const [open, setOpen] = useState(false);
   const [age, setAge] = useState("All ages")
   const [genre, setGenre] = useState("all");
+  const [userGenre, setUserGenre] = useState("")
   const[size, setSize] = useState("10");
   const [center, setCenter] = useState(() => { // this useState remembers the current center even if the page is refreshed
   const savedCenter = localStorage.getItem("mapCenter");
@@ -295,8 +300,9 @@ function App()
       }}/>
 
 
-
+        {/* GO Button */}
       {search && goButton && <button className="goButton" onClick={() => handleSearch(search,size)}>GO</button>}
+      
     </div>
      <>
         </>
@@ -342,27 +348,44 @@ function App()
   
       {(View === "user" ? userEvents : events)  
           .filter(event =>  { // filters all the events the user selects, if "all", it returns all events
-            
+  
+            let ticketmasterGenreMatch = "", UserGenreMatch= ""
+
             // Filter by genre first
-            const genreMatch = genre.toLowerCase() === "all" || event.predicted_vibe.toLowerCase() === genre.toLowerCase();
-    
+            if (View === "ticketmaster")
+            {
+               ticketmasterGenreMatch = genre.toLowerCase() === "all" || event.predicted_vibe.toLowerCase() === genre.toLowerCase();
+            }
+            else if (View === "user")
+            {
+                UserGenreMatch = genre.toLowerCase() === "all" || event.genre.toLowerCase() === genre.toLowerCase();
+            }
+
             // Normalize age values
             const eventAge = event.ageRestriction ? event.ageRestriction.trim() : "All ages";
             const selectedAge = age ? age.trim() : "All ages";
 
             const ageMatch = selectedAge === "All ages" || eventAge === selectedAge;
+
             let month = "", day ="", year =""
 
             // Parse event start date safely (MM-DD-YYYY)
-
             if (View == "ticketmaster" && event.start_time)
             {
               const [monthStr, dayStr, yearStr] = event.start_time.split("-");
               month = parseInt(monthStr, 10);
               day = parseInt(dayStr, 10);
               year = parseInt(yearStr, 10);
-
             }
+            // User Events uses a different format for the date so some things have to change for the filter to work with both types of events
+            else if (View === "user")
+            {
+               const [yearStr2, monthStr2, dayStr2] = event.start_date.split("-");
+               year = parseInt(yearStr2, 10);
+              month = parseInt(monthStr2, 10);
+              day = parseInt(dayStr2, 10);  
+            }
+
             const eventDate = new Date(year, month - 1, day); // JS months are 0-indexed
             if (isNaN(eventDate)) return false; // skip invalid dates
           
@@ -379,14 +402,24 @@ function App()
                return savedEventIds.includes(event.id); // only show saved events
              }
           
-            if (timeFilter === "0")
+            // Shows all events regardless of date
+            if (timeFilter === "0" && View === "ticketmaster")
             {
-              return genreMatch && ageMatch 
+              return ticketmasterGenreMatch && ageMatch 
+            }
+            else if (timeFilter === "0" && View === "user")
+            {
+              return UserGenreMatch && ageMatch 
             }
 
             const filterTime = new Date(now.getFullYear(), now.getMonth(), now.getDate() + value); // filters all events by the date it begins
+
+            if (View === "user")
+            {
+               return UserGenreMatch && ageMatch && (eventDate <= filterTime)
+            }
  
-            return genreMatch && ageMatch && (eventDate <= filterTime);
+            return ticketmasterGenreMatch && ageMatch && (eventDate <= filterTime);
           })
            
             .filter(event => event.latitude != null && event.longitude != null)

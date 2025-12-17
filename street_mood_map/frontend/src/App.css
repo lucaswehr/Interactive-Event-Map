@@ -70,7 +70,7 @@ color:red;
 .goButton{
 
   
-  z-index: 10005;
+  z-index: 1000;
   margin-left: -45px;
   border-radius: 10px; 
   background-color: lightgray;
@@ -246,6 +246,7 @@ color:red;
 
 .submit:active{
   transform: translateY(5px);
+  
 }
 
 .homeButton{
@@ -255,5 +256,56 @@ color:red;
 .homeButton:hover{
   cursor: pointer;
   background-color: rgb(219, 219, 219);
+
+}
+
+
+/* Chrome, Safari, Edge */
+.venueCapacityBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 30px;      
+  height: 30px;
+  background: #ffffff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #000000;
+  
+}
+
+.venueCapacityBar {
+ -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 12px;              /* bar thickness */
+  background: black;       /* bar color */
+  border-radius: 6px;
+  outline: none;
+}
+
+.HTML-Sensitive-Buttons {
+  appearance:none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  box-Shadow:2px 8px 10px black;
+  width: 100%;
+  height: 5vh;
+  color: black;
+  background-color: white;
+  border-radius: 10px;
+ border: 3px solid black;
+  cursor: pointer;
+  outline:none;
+}
+
+.addEventTexts {
+  z-index:10000;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  color: white;
+  text-shadow:2px 3px 0px black;
 }
 
