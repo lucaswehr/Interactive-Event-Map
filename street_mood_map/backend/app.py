@@ -354,7 +354,8 @@ def userEvent():
       description=data.get("description"),
       genre=data.get("genre"),
       ageRestriction=data.get("ageRestriction"),
-      start_date= data.get("start_date")
+      start_date= data.get("start_date"),
+      timezone =data.get("timezone")
    )
 
    session.add(newEvent)
@@ -394,7 +395,8 @@ def get_user_events():
          "genre": e.genre,
          "ageRestriction": e.ageRestriction,
          "start_date": e.start_date,
-         "venue_capacity": e.venue_capacity
+         "venue_capacity": e.venue_capacity,
+         "timezone": e.timezone
 
       } for e in events])
 

@@ -57,6 +57,7 @@ class UserEvent(Base): # creates individual columns for each row
     genre = Column(String(200))
     ageRestriction = Column(String(10))
     start_date = Column(String(20))
+    timezone = Column(String(50))
 
 
 Base.metadata.create_all(engine)

@@ -22,6 +22,7 @@ function User()
     ageRestriction: "All Ages",
     start_date: "",
     venue: "N/A",
+    timezone: "Eastern"
     });
 
     const capacityOptions = [10, 100, 250, 500, 1000, 2500, 5000, 10000];
@@ -44,6 +45,8 @@ function User()
         
        return data;
     }
+
+    
 
     async function submitUserEvent()
     {
@@ -144,6 +147,17 @@ function User()
                   <strong>Start Time</strong>
               <input className="HTML-Sensitive-Buttons" name="start_time" value={form.start_time} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="time"></input>
             </div>
+
+             <div className="addEventTexts">
+                  <strong>TimeZone</strong> 
+                    <select className="HTML-Sensitive-Buttons" name="timezone" style={{textIndent:"3px", width:"110%"}}  value={form.timezone} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))}>
+                      <option value = "ET"> America/New_York </option>
+                      <option value = "CT">America/Chicago</option>
+                      <option value = "MT">America/Denver</option>
+                      <option value = "PT">America/Los_Angeles</option>                                         
+                  </select>
+              </div>
+
 
             <div className="addEventTexts">
                   <strong>Start Date</strong> 
