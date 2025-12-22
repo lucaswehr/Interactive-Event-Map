@@ -116,7 +116,15 @@ return (
         {view === "user" &&
         <p>Date: {event.start_date}</p>
         }
-        Start: {event.start_time} PST<br/>
+
+        {view === "ticketmaster" &&
+         <p>Start: {event.start_time} PT<br/></p>
+        }
+
+        {view === "user" &&
+         <p>Start: {event.start_time} ({event.timezone}) <br/></p>
+        }
+      
     
 
        {/* target: opens link in a different tab | rel: security reasons, good practice */}
@@ -147,7 +155,7 @@ return (
         <p><strong>Age Restrictions: </strong>{event.ageRestriction}</p>
 
        {view === "user" &&
-        <p><strong>Capacity: </strong>{event.venue_capacity}</p>
+        <p><strong>Capacity: </strong>{event.venue_capacity}+</p>
        }
 
   </div>
@@ -194,6 +202,7 @@ function App()
   const [events, setEvents] = useState([])
   const [userEvents, setUserEvents] = useState([])
   const [search, setSearch] = useState(""); // stores current search input
+  
 
   useEffect(() => { // the reactive UI part of the frontend, allows me to see changes without refreshing the page 
 
@@ -272,8 +281,6 @@ function App()
       useEffect(() => {
         console.log("Events updated:", events);
       }, [events]);
-
-
 
 
 
@@ -424,7 +431,7 @@ function App()
            
             .filter(event => event.latitude != null && event.longitude != null)
           .map(event => ( // loops through all my events in the useState
-        <EventMarker key={event.id} event={event} view={View}/> 
+        <EventMarker key={event.id} event={event} view={View} /> 
       ))} 
       </MarkerClusterGroup>
 
