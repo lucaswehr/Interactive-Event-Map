@@ -32,8 +32,8 @@ function User()
       const res = await fetch(`http://192.168.0.104:5000/api/geocode?address=${encodeURIComponent(address)}`)  
       
        if (!res.ok) {
-        alert("error")
-         throw new Error("Failed to geocode address");
+        alert("Could not find City! Check for Correct Spelling!")
+        return;
        }
 
        const data = await res.json();
@@ -135,12 +135,14 @@ function User()
               
             <div className="addEventTexts">
                   <strong>Event Name</strong>
-              <input name="name" value={form.name} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"2px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+              <input maxLength={40} name="name" value={form.name} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+                 Max Length: 40
             </div>
 
             <div className="addEventTexts">
                   <strong>Venue</strong>
-              <input name="venue" value={form.venue} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+              <input maxLength={20}name="venue" value={form.venue} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+                Max Length: 20
             </div>
 
             <div className="addEventTexts">
@@ -193,13 +195,15 @@ function User()
             
             <div className="addEventTexts">
                   <strong>Address</strong> 
-              <input  value={address} onChange={(e) => setAddress(e.target.value)} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+              <input maxLength={50} value={address} onChange={(e) => setAddress(e.target.value)} type="text" style={{width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", textIndent:"5px", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></input>
+                Max Length: 50
             </div>
     
                 
               <div className="addEventTexts">
                     <strong>Description</strong>
-                <textarea name="description" value={form.description} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"15vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></textarea>
+                <textarea maxLength={300} name="description" value={form.description} onChange={(e) => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))} type="text" style={{width:"100%",height:"15vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"4px solid black", fontSize:"16px",boxShadow:"2px 8px 10px black"}}></textarea>
+                 Max Length: 300
               </div> 
 
               <div className="addEventTexts">
