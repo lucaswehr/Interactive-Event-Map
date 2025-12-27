@@ -264,7 +264,6 @@ function App()
         .then(data => {
         if (data.lat && data.lng) {
           const { lat, lng } = data;
-          alert(lat)
           setCenter([lat, lng]); // triggers Recenter
           setTimeout(() => {
          window.location.reload();
@@ -282,7 +281,8 @@ function App()
         console.log("Events updated:", events);
       }, [events]);
 
-
+  const activeEvents = View === "user" ? userEvents : events;
+  const safeEvents = Array.isArray(activeEvents) ? activeEvents : [];
 
   return (
     <> 
@@ -353,7 +353,7 @@ function App()
 
       <MarkerClusterGroup chunkedLoading={true} maxClusterRadius={50}  spiderfyDistanceMultiplier={2}>
   
-      {(View === "user" ? userEvents : events)  
+      {(safeEvents)  
           .filter(event =>  { // filters all the events the user selects, if "all", it returns all events
   
             let ticketmasterGenreMatch = "", UserGenreMatch= ""

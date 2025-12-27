@@ -28,11 +28,20 @@ import uuid
 from werkzeug.utils import secure_filename
 
 
-
-
-cache = redis.Redis(host="0.0.0.0", port=6379, db=0) # --> connects to redis for caching
-
 load_dotenv() # --> gets my hidden api key
+
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
+
+cache = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, password=REDIS_PASSWORD, db=0) # --> connects to redis for caching
+
+try:
+    cache.ping()
+    print("Redis is connected!")
+    
+except redis.exceptions.ConnectionError:
+    print("Failed to connect to Redis.")
 
 Session = sessionmaker(bind=engine)
 
@@ -331,15 +340,10 @@ def userEvent():
    session = Session()
    data = request.form
 
-   file = request.files.get('image_url') # Gets my image url from the frontend
-   filename = secure_filename(file.filename) # Prevents malicious paths to my image and takes out unsafe characters such as >,<, or ?
-   file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename)) # Stores the file into the uploads folder
-   image_url = f"/uploads/{filename}"  # This is whats stored into the Database and is used in the front end as event.image_url
-
-   print("------------------------------------------")
-   print("Received start_date:", data.get("start_date"))
-   print("Received start_time:", data.get("start_time"))
-   print("------------------------------------------")
+   # print("------------------------------------------")
+   # print("Received start_date:", data.get("start_date"))
+   # print("Received start_time:", data.get("start_time"))
+   # print("------------------------------------------")
 
    newEvent = UserEvent(
       id=str(uuid.uuid4()),
@@ -350,7 +354,7 @@ def userEvent():
       longitude = data.get("longitude"),
       start_time= to_standard_time(data.get("start_time")),
       venue_capacity=data.get("venue_capacity", 0),
-      image_url=image_url,
+      image_url=data.get('image_url'),
       description=data.get("description"),
       genre=data.get("genre"),
       ageRestriction=data.get("ageRestriction"),
@@ -411,15 +415,12 @@ def geoCode():
    params = { "q": address, "key": GEO_KEY }
 
    r = requests.get(url, params=params).json()
-   print("OpenCage response:", r)
-
+  
    if not r["results"]:
         return {"error": "not found"}, 404
    
    loc = r["results"][0]["geometry"]
 
-   print("-------------------------------------------")
-   print (loc["lat"])
 
    return {
 
@@ -439,4 +440,4 @@ def uploaded_file(filename):
 #---------------------------------------------------------------------------------------------------#
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0', port=5000)
+    app.run()
