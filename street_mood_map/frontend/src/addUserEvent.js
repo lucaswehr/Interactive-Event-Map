@@ -2,12 +2,58 @@ import React, {useState } from "react";
 
 import './App.css' 
 
+ const selectedImages = [
+    "/uploads/basketball.webp",
+    "/uploads/baseball.webp",
+    "/uploads/football.webp",
+    "/uploads/hockey.webp",
+    "/uploads/racing.webp",
+    "/uploads/volleyball.webp",
+    "/uploads/tennis.webp",
+    "/uploads/soccer.webp",
+    "/uploads/sports.webp",
+    "/uploads/food.webp",
+    "/uploads/ticket.webp",
+    "/uploads/theater.webp",
+    "/uploads/music notes.webp",
+    "/uploads/orchestra.webp",
+    "/uploads/concert.webp",
+
+  ]
+
+function ImagePicker({ selectedImage, setSelectedImage }) {
+  return (
+    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", flexDirection:"row" }}>
+      {selectedImages.map((img, idx) => (
+        <img
+          key={idx}
+          src={img}
+          alt={`Option ${idx}`}
+          style={{
+            width: "80px",
+            height: "80px",
+            border: selectedImage === img ? "3px solid black" : "2px solid gray",
+            borderRadius: "8px",
+            cursor: "pointer",
+            objectFit: "cover",
+          }}
+          onClick={() => setSelectedImage(img)}
+        />
+      ))}
+    </div>
+  );
+}
+
 function User()
 {
 
     const [address, setAddress] = useState("")
   const [search, setSearch] = useState(""); // stores current search input
-   
+
+ 
+  
+  const [selectedImage, setSelectedImage] = useState(selectedImages[0]);
+
     const [background, setBackground] = useState(false)
     const [form, setForm] = useState({
     name: "",
@@ -99,6 +145,8 @@ function User()
           {
              alert("City not found!");
           }
+
+          alert(form.image_url)
         
         submitUserEvent()
 
@@ -207,26 +255,19 @@ function User()
               </div> 
 
               <div className="addEventTexts">
-                    <strong>Image</strong>
+                    <strong>Select Image</strong>
 
-                    <button onClick={() => document.getElementById("imageInput").click()} style={{cursor:"pointer",color:"black",width:"100%",height:"5vh", zIndex:1005, outline:"none", borderRadius:"10px", outline:"3px solid black", fontSize:"16px",boxShadow:"2px 8px 10px black"}}>
-                       Select Image</button>
-                <input id="imageInput" type="file" hidden accept="image/*" name="image_url" onChange={(e) => setForm(prev => ({ ...prev, image_url: e.target.files[0] }))}></input>
+                    <ImagePicker selectedImage={selectedImage} setSelectedImage={(img) => {
+                    setSelectedImage(img); // update the selected image state
+                    setForm(prev => ({ ...prev, image_url: img })); // also update the form state
+                  }}/>
+                    {form.image_url}
                 </div>
 
                <div  style={{zIndex:10000, alignItems:"center", display:"flex", flexDirection:"column", gap:"1vh", color:"white", marginLeft:"10px", textShadow:"2px 3px 0px black"}}>
-                  {form.image_url &&(
-                  <img 
-                  src={URL.createObjectURL(form.image_url)} 
-                  style={{width: "50vw", height: "100%", objectFit: "cover", marginTop:"6vh", outline:"8px solid black"}} 
-                />
-                )}
-                {form.image_url.name}
-
                  <div className="submit" onClick={handleChange} style={{ color:"white",width:"200px", height:"5vh", zIndex:10000,borderRadius:"10px", outline:"3px solid black", alignContent:"center", textAlign:"center", boxShadow:"2px 8px 10px black", marginTop:"4vh"}}>
                   <strong>Submit</strong>
                   </div>
-           
                </div>      
         </div>
        </>
