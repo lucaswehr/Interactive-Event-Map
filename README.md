@@ -7,9 +7,13 @@ I'm also using mySQL to store and query data which taught me so much on how data
 TOOLS USED:
 ----------------------------------------
 React.js
+
 JavaScript
+
 Python
+
 mySQL
+
 Heroku/AWS
 
 
