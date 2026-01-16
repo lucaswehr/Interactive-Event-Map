@@ -1,7 +1,7 @@
 
 Welcome to the Interactive Event Map made by me!
 
-This is a project that I just published in Decemeber, and is free to use by anyone. I used Heroku to deoloy the website.
+This is a project that I just published in Decemeber, and is free to use by anyone. I used Heroku to deploy the website.
 I'm also using mySQL to store and query data which taught me so much on how databases work and how it connects with my flask backend and react frontend.
 
 RESTRAINTS:
