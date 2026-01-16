@@ -24,6 +24,10 @@ RESTRAINTS:
 
 2.) Designed best for phones, but still works on any other platform
 
+3.) Searching for cities that have the same name needs the state in the search bar as well (i.e Portland Maine, Portland Oregon)
+
+4.) Cities within Cities might not be recognized, best to go with the broadest name (i.e (Vancouver, Oregon) might not work but (Portland, Oregon) will)
+
 PROBLEM:
 ----------------------------------------
 
