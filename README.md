@@ -8,6 +8,7 @@ RESTRAINTS:
 -------------------------
 
 1.) This website only works for U.S. cities
+
 2.) Designed best for phones, but still works on any other platform
 
 PROBLEM:
