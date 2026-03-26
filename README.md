@@ -67,6 +67,7 @@ When you press "add event," you will go to a new screen where you be prompted to
 HEROKU DEPLOYMENT DETAILS
 ----------------------------------------
 #-----------------------------------------------------------------------------------------------------------------------------------------# 
+
   Heroku - Hosts app and distributes traffic accross dynos. 
           NOTE: Heroku only executes whatever is inside my Procfile which happens to be Gunicorn
 
