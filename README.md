@@ -64,4 +64,24 @@ When you press "add event," you will go to a new screen where you be prompted to
 
 4.) Refresh the page
 
+HEROKU DEPLOYMENT DETAILS
+----------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------# 
+  Heroku - Hosts app and distributes traffic accross dynos. 
+          NOTE: Heroku only executes whatever is inside my Procfile which happens to be Gunicorn
+
+  Dynos - Is its own container with each one having its own memory (CPU and RAM) that contains workers.
+           NOTE: Indivudal dynos do not share memory with each other
+
+  Workers - Each worker handles a request made by the user. Example: 6 workers means that the site can handle 
+          6 concurrent requests at the same time, if 10 people request at the same time, # 4 of them have to wait until a worker is available 
+
+  Gunicorn - Inside each dyno, Gunicorn runs as the web server. Gunicorn listens for HTTP requests, manages worker processes, 
+           distributes requests to workers, and restarts them if they crash.
+
+ Flask- My actual backend application. When the workers recieve HTTP request data, Gunicorn converts it using WSGI so
+       that python can understand it. Once the requested data is located in flask, the worker retrieves it and Gunicorn coverts it back into an HTTP
+       request which is sent back up the pipeline.
+#--------------------------------------------------------------------------------------------------------------------------------------------#
+
 
