@@ -82,6 +82,7 @@ HEROKU DEPLOYMENT DETAILS
  Flask- My actual backend application. When the workers recieve HTTP request data, Gunicorn converts it using WSGI so
        that python can understand it. Once the requested data is located in flask, the worker retrieves it and Gunicorn coverts it back into an HTTP
        request which is sent back up the pipeline.
+       
 #--------------------------------------------------------------------------------------------------------------------------------------------#
 
 
